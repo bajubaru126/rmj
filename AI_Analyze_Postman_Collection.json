@@ -1,0 +1,77 @@
+{
+  "info": {
+    "name": "RMJ AI Analyze API",
+    "description": "Collection for testing AI image analysis endpoint",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "AI Analyze Image",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": []
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/ai/analyze",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "ai",
+            "analyze"
+          ]
+        },
+        "description": "Analyze field documentation image using AI"
+      },
+      "response": []
+    },
+    {
+      "name": "AI Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/ai/health",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "ai",
+            "health"
+          ]
+        },
+        "description": "Check AI service health status"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "your_jwt_token_here",
+      "type": "string"
+    }
+  ]
+}

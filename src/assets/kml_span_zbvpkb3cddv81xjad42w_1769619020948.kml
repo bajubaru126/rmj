@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document id="1IPOEP43bbLBIFrlETk6DgggiJNWxLO_l">
+	<name>kml original</name>
+	<gx:CascadingStyle kml:id="__managed_style_27BBF56DCC3D33F5F31C">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2f2fd3</color>
+				<width>4.8</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<gx:CascadingStyle kml:id="__managed_style_1466F6292C3D33F5F31C">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2f2fd3</color>
+				<width>3.2</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<StyleMap id="__managed_style_0696A5D0573D33F5F31C">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#__managed_style_1466F6292C3D33F5F31C</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#__managed_style_27BBF56DCC3D33F5F31C</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Placemark id="09A4F829163D33F5CB74">
+		<name>Jalur tanpa judul</name>
+		<LookAt>
+			<longitude>109.2742700108878</longitude>
+			<latitude>-7.422827082065242</latitude>
+			<altitude>74.92056257317741</altitude>
+			<heading>8.537736462515939e-07</heading>
+			<tilt>0</tilt>
+			<gx:fovy>35</gx:fovy>
+			<range>530.0335470293795</range>
+			<altitudeMode>absolute</altitudeMode>
+		</LookAt>
+		<styleUrl>#__managed_style_0696A5D0573D33F5F31C</styleUrl>
+		<LineString>
+			<coordinates>
+				109.2730467513862,-7.422983465068791,0 109.2759675363823,-7.423353396209715,0 109.2788037101942,-7.423761573946059,0 
+			</coordinates>
+		</LineString>
+	</Placemark>
+        <Folder>
+      <name>SPAN SUMENEP - JT01</name>
+      <Placemark>
+        <name>Route</name>
+        <description>Span route LineString</description>
+        <LineString>
+          <coordinates>109.2730474,-7.4229842,0 109.2750369,-7.4232357,0</coordinates>
+        </LineString>
+      </Placemark>
+    </Folder>
+    <Folder>
+      <name>Designator</name>
+      <Folder>
+        <name>SPAN SUMENEP - JT01</name>
+        <Placemark>
+              <name>SC48</name>
+              <description>Survey Location: Jl. Sudirman No. 123, Sumenep | Date: d'2024-01-27T10:00:00Z'</description>
+              <Point>
+                <coordinates>109.2730474,-7.4229842,0</coordinates>
+              </Point>
+            </Placemark>
+        <Placemark>
+              <name>DD-BM-HDPE-40-1</name>
+              <description>Survey Location: Jl. Sudirman No. 123, Sumenep | Date: d'2024-01-27T10:00:00Z'</description>
+              <Point>
+                <coordinates>109.2740109,-7.4231055,0</coordinates>
+              </Point>
+            </Placemark>
+        <Placemark>
+              <name>HH2</name>
+              <description>Survey Location: Jl. Sudirman No. 123, Sumenep | Date: d'2024-01-27T10:00:00Z'</description>
+              <Point>
+                <coordinates>109.2750369,-7.4232357,0</coordinates>
+              </Point>
+            </Placemark>
+      </Folder>
+      <Placemark>
+            <name>PUAS</name>
+            <description>Survey Location: Jl. Sudirman No. 123, Sumenep | Date: d'2024-01-27T10:00:00Z'</description>
+            <Point>
+              <coordinates>109.2757674,-7.4233302,0</coordinates>
+            </Point>
+          </Placemark>
+      <Placemark>
+            <name>HBPS1</name>
+            <description>Survey Location: Jl. Sudirman No. 123, Sumenep | Date: d'2024-01-27T10:00:00Z'</description>
+            <Point>
+              <coordinates>109.2770651,-7.4235118,0</coordinates>
+            </Point>
+          </Placemark>
+      <Placemark>
+            <name>HH2</name>
+            <description>Survey Location: Jl. Sudirman No. 123, Sumenep | Date: d'2024-01-27T10:00:00Z'</description>
+            <Point>
+              <coordinates>109.2788029,-7.4237612,0</coordinates>
+            </Point>
+          </Placemark>
+    </Folder>
+  </Document>
+</kml>

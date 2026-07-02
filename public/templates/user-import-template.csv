@@ -1,0 +1,5 @@
+username,email,password,role,vendor_name,vendor_code
+john.doe,john.doe@example.com,SecurePass123!,teknisi_lapangan,PT Telkom Indonesia,TLKM
+jane.smith,jane.smith@example.com,AdminPass456!,admin,PT Indosat Ooredoo,ISAT
+bob.wilson,bob.wilson@example.com,TechPass789!,teknisi_lapangan,PT XL Axiata,EXCL
+    

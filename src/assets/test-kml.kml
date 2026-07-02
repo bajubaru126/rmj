@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document>
+	<name>Peta tanpa judul</name>
+	<gx:CascadingStyle kml:id="__managed_style_25C0F5B1133D107689F8">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2f2fd3</color>
+				<width>4</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<gx:CascadingStyle kml:id="__managed_style_181A2886613D107689F8">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2f2fd3</color>
+				<width>2.66667</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<gx:CascadingStyle kml:id="__managed_style_293A46A90F3D1070034F">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff3c8e38</color>
+				<width>4</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<gx:CascadingStyle kml:id="__managed_style_1DBBB660393D10770764">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff9f3f30</color>
+				<width>2.66667</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<StyleMap id="__managed_style_0CE01BC6C93D10770764">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#__managed_style_1DBBB660393D10770764</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#__managed_style_28F54A92F43D10770764</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="__managed_style_0ABDAB3F933D106F9F70">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#__managed_style_18BC8DDD0D3D106F9F70</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#__managed_style_2227FD36703D106F9F70</styleUrl>
+		</Pair>
+	</StyleMap>
+	<gx:CascadingStyle kml:id="__managed_style_28F54A92F43D10770764">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff9f3f30</color>
+				<width>4</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<gx:CascadingStyle kml:id="__managed_style_1DCF3E1F023D1070034F">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff3c8e38</color>
+				<width>2.66667</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<StyleMap id="__managed_style_0521E907503D1070034F">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#__managed_style_1DCF3E1F023D1070034F</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#__managed_style_293A46A90F3D1070034F</styleUrl>
+		</Pair>
+	</StyleMap>
+	<gx:CascadingStyle kml:id="__managed_style_2227FD36703D106F9F70">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>4</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<gx:CascadingStyle kml:id="__managed_style_18BC8DDD0D3D106F9F70">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>2.66667</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+				<displayMode>hide</displayMode>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<StyleMap id="__managed_style_05A7F59A603D107689F8">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#__managed_style_181A2886613D107689F8</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#__managed_style_25C0F5B1133D107689F8</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Placemark id="09C18EE3623D106F9F49">
+		<name>Tanah Lunak</name>
+		<LookAt>
+			<longitude>109.1944302799689</longitude>
+			<latitude>-7.476564600016178</latitude>
+			<altitude>45.42478526434271</altitude>
+			<heading>0</heading>
+			<tilt>0</tilt>
+			<gx:fovy>30.0000035</gx:fovy>
+			<range>601.6374953874765</range>
+			<altitudeMode>absolute</altitudeMode>
+		</LookAt>
+		<styleUrl>#__managed_style_0ABDAB3F933D106F9F70</styleUrl>
+		<LineString>
+			<coordinates>
+				109.1932939552927,-7.477001140697255,0 109.1935285725902,-7.47694222622294,0 
+			</coordinates>
+		</LineString>
+	</Placemark>
+	<Placemark id="08040010A43D106FF7EB">
+		<name>Tanah Berpasir</name>
+		<LookAt>
+			<longitude>109.1935417577592</longitude>
+			<latitude>-7.476923372698254</latitude>
+			<altitude>57.94587724913267</altitude>
+			<heading>0</heading>
+			<tilt>0</tilt>
+			<gx:fovy>30.0000035</gx:fovy>
+			<range>29.14800119765005</range>
+			<altitudeMode>absolute</altitudeMode>
+		</LookAt>
+		<styleUrl>#__managed_style_0521E907503D1070034F</styleUrl>
+		<LineString>
+			<coordinates>
+				109.1935283379661,-7.476941788954839,0 109.1936749046991,-7.476875480334216,0 
+			</coordinates>
+		</LineString>
+	</Placemark>
+	<Placemark id="088A66D2393D10764B2B">
+		<name>Tanah Berbatu</name>
+		<LookAt>
+			<longitude>109.1939432972874</longitude>
+			<latitude>-7.476630768717041</latitude>
+			<altitude>52.50273295845348</altitude>
+			<heading>0</heading>
+			<tilt>0</tilt>
+			<gx:fovy>30.0000035</gx:fovy>
+			<range>171.4193577593142</range>
+			<altitudeMode>absolute</altitudeMode>
+		</LookAt>
+		<styleUrl>#__managed_style_0CE01BC6C93D10770764</styleUrl>
+		<LineString>
+			<coordinates>
+				109.1936746399296,-7.476874443511877,0 109.193886867546,-7.476769147123617,0 
+			</coordinates>
+		</LineString>
+	</Placemark>
+	<Placemark id="0268B4F2BA3D10767770">
+		<name>Tanah Keras</name>
+		<LookAt>
+			<longitude>109.1939434817717</longitude>
+			<latitude>-7.476630604814318</latitude>
+			<altitude>52.50046925081816</altitude>
+			<heading>0</heading>
+			<tilt>0</tilt>
+			<gx:fovy>30.0000035</gx:fovy>
+			<range>171.4216059864521</range>
+			<altitudeMode>absolute</altitudeMode>
+		</LookAt>
+		<styleUrl>#__managed_style_05A7F59A603D107689F8</styleUrl>
+		<LineString>
+			<coordinates>
+				109.1938863470829,-7.476768976870602,0 109.1940309892375,-7.476697776417329,0 109.1941907879911,-7.476576848563903,0 
+			</coordinates>
+		</LineString>
+	</Placemark>
+</Document>
+</kml>

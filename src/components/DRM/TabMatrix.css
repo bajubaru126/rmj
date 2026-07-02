@@ -1,0 +1,423 @@
+/* Matrix Table - Ultra Clean Design (Same as BOQ) */
+
+/* Main Header - Light Gray (Same as BOQ) */
+.matrix-table-custom .ag-header {
+  background-color: #F8F9FA !important;
+  border-bottom: 1px solid #E9ECEF !important;
+}
+
+/* Header Cells - Light Gray (Same as BOQ) */
+.matrix-table-custom .ag-header-cell {
+  background-color: #F8F9FA !important;
+  color: #495057 !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.02em !important;
+  border-right: 1px solid #E9ECEF !important;
+  padding: 10px 12px !important;
+  line-height: 1.4 !important;
+}
+
+/* Header Group Cells - Slightly Darker Gray (Same as BOQ) */
+.matrix-table-custom .ag-header-group-cell {
+  background-color: #F1F3F5 !important;
+  color: #495057 !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.02em !important;
+  border-right: 1px solid #E9ECEF !important;
+  border-bottom: 1px solid #E9ECEF !important;
+  padding: 8px 12px !important;
+  text-align: center !important;
+}
+
+.matrix-table-custom .ag-header-cell-label,
+.matrix-table-custom .ag-header-group-text {
+  color: #495057 !important;
+  font-weight: 600 !important;
+}
+
+/* Row Styling - Clean White (Same as BOQ) */
+.matrix-table-custom .ag-row {
+  background-color: #FFFFFF !important;
+  border-bottom: 1px solid #F1F3F5 !important;
+}
+
+.matrix-table-custom .ag-row:hover {
+  background-color: #F8FAFC !important;
+}
+
+.matrix-table-custom .ag-row-even {
+  background-color: #F9FAFB !important;
+}
+
+.matrix-table-custom .ag-row-even:hover {
+  background-color: #F8FAFC !important;
+}
+
+/* Cell Styling - Simple and Readable (Same as BOQ) */
+.matrix-table-custom .ag-cell {
+  display: flex !important;
+  align-items: center !important;
+  padding: 12px !important;
+  font-size: 13px !important;
+  color: #212529 !important;
+  border-right: 1px solid #F1F3F5 !important;
+  line-height: 1.5 !important;
+  font-weight: 500 !important;
+}
+
+.matrix-table-custom .ag-cell-wrapper {
+  width: 100%;
+  line-height: 1.5 !important;
+}
+
+.matrix-table-custom .cell-center {
+  justify-content: center !important;
+}
+
+/* Borders (Same as BOQ) */
+.matrix-table-custom .ag-header-cell,
+.matrix-table-custom .ag-cell {
+  border-color: #E9ECEF !important;
+}
+
+.matrix-table-custom .ag-cell {
+  border-bottom: 1px solid #F1F3F5 !important;
+}
+
+/* Hide Filter Icons (Same as BOQ) */
+.matrix-table-custom .ag-header-cell-menu-button,
+.matrix-table-custom .ag-header-cell-filter-button {
+  display: none !important;
+}
+
+/* Sort Icons - Simple (Same as BOQ) */
+.matrix-table-custom .ag-header-cell .ag-icon {
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.matrix-table-custom .ag-header-cell:hover .ag-icon {
+  opacity: 0.5 !important;
+}
+
+/* Header Group Alignment */
+.matrix-table-custom .ag-header-group-cell-label {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+.matrix-table-custom .ag-header-group-cell {
+  text-align: center !important;
+}
+
+.matrix-table-custom .ag-header-group-cell-label .ag-header-group-text {
+  text-align: center !important;
+  width: 100% !important;
+  display: block !important;
+}
+
+/* Group Header Borders (Same as BOQ) */
+.matrix-table-custom .ag-header-group-cell {
+  border-right: 1px solid #E9ECEF !important;
+  border-left: 1px solid #E9ECEF !important;
+  border-bottom: 1px solid #E9ECEF !important;
+}
+
+.matrix-table-custom .ag-header-group-cell + .ag-header-cell {
+  border-top: 1px solid #E9ECEF !important;
+}
+
+/* Column Separators (Same as BOQ) */
+.matrix-table-custom .ag-header-cell[col-id="slack_berbayar"],
+.matrix-table-custom .ag-header-cell[col-id="slack_tidak_berbayar"],
+.matrix-table-custom .ag-header-cell[col-id="bm"] {
+  border-left: 1px solid #E9ECEF !important;
+}
+
+.matrix-table-custom .ag-header-cell[col-id="fo_total"],
+.matrix-table-custom .ag-header-cell[col-id="pengadaan"],
+.matrix-table-custom .ag-header-cell[col-id="hps2"] {
+  border-right: 1px solid #E9ECEF !important;
+}
+
+/* Data Cell Separators (Same as BOQ) */
+.matrix-table-custom .ag-cell[col-id="slack_berbayar"],
+.matrix-table-custom .ag-cell[col-id="slack_tidak_berbayar"],
+.matrix-table-custom .ag-cell[col-id="bm"] {
+  border-left: 1px solid #F1F3F5 !important;
+}
+
+.matrix-table-custom .ag-cell[col-id="fo_total"],
+.matrix-table-custom .ag-cell[col-id="pengadaan"],
+.matrix-table-custom .ag-cell[col-id="hps2"] {
+  border-right: 1px solid #F1F3F5 !important;
+}
+
+/* Number Formatting (Same as BOQ) */
+.matrix-table-custom .ag-cell[col-id="offset"],
+.matrix-table-custom .ag-cell[col-id="offset_from"],
+.matrix-table-custom .ag-cell[col-id="offset_to"],
+.matrix-table-custom .ag-cell[col-id="length"],
+.matrix-table-custom .ag-cell[col-id="depth"] {
+  font-variant-numeric: tabular-nums !important;
+  font-weight: 500 !important;
+  color: #212529 !important;
+}
+
+/* NO/Span Column (Same as BOQ) */
+.matrix-table-custom .ag-cell[col-id="span"] {
+  font-weight: 500 !important;
+  color: #6C757D !important;
+}
+
+/* Designator Column - Bold */
+.matrix-table-custom .ag-cell[col-id="designator"] {
+  color: #111827 !important;
+  font-weight: 700 !important;
+}
+
+/* Actions Column (Same as BOQ) */
+.matrix-table-custom .ag-pinned-right-header,
+.matrix-table-custom .ag-pinned-right-cols-container {
+  border-left: 1px solid #E9ECEF !important;
+  background-color: #FFFFFF !important;
+}
+
+/* Row Group Styling - Light Gray (Same as BOQ) */
+.matrix-table-custom .ag-row-group {
+  background-color: #F1F5F9 !important;
+  font-weight: 700 !important;
+  color: #475569 !important;
+  border-left: 3px solid #94A3B8 !important;
+}
+
+.matrix-table-custom .ag-row-group:hover {
+  background-color: #E2E8F0 !important;
+}
+
+/* Expand/Collapse Icon - Minimalist (Same as BOQ) */
+.matrix-table-custom .ag-row-group .ag-group-expanded,
+.matrix-table-custom .ag-row-group .ag-group-contracted {
+  color: #94A3B8 !important;
+  opacity: 0.8 !important;
+}
+
+.matrix-table-custom .ag-row-group:hover .ag-group-expanded,
+.matrix-table-custom .ag-row-group:hover .ag-group-contracted {
+  opacity: 1 !important;
+}
+
+/* REKAPITULASI Section Styling - Consistent with Main Table (Same as BOQ) */
+
+/* REKAPITULASI Group Row (Collapsed/Expanded) - Same as other group rows */
+.matrix-table-custom .ag-row-group[row-id*="REKAPITULASI"] {
+  background-color: #F1F5F9 !important;
+  font-weight: 700 !important;
+  color: #475569 !important;
+  border-left: 3px solid #94A3B8 !important;
+}
+
+.matrix-table-custom .ag-row-group[row-id*="REKAPITULASI"]:hover {
+  background-color: #E2E8F0 !important;
+}
+
+.matrix-table-custom .ag-row-group[row-id*="REKAPITULASI"] .ag-cell {
+  background-color: #F1F5F9 !important;
+  color: #475569 !important;
+}
+
+.matrix-table-custom .ag-row-group[row-id*="REKAPITULASI"]:hover .ag-cell {
+  background-color: #E2E8F0 !important;
+}
+
+/* REKAPITULASI Expanded Rows - Clean Minimalist Design (Same as BOQ) */
+
+/* Header Row inside REKAPITULASI (when expanded) */
+.matrix-table-custom .ag-row-rekap-header .ag-cell {
+  background-color: #F8F9FA !important;
+  color: #495057 !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.02em !important;
+  border-right: 1px solid #E9ECEF !important;
+  padding: 10px 12px !important;
+}
+
+/* SUB TOTAL Rows - Light Gray Background (Same as BOQ) */
+.matrix-table-custom .ag-row-rekap-subtotal .ag-cell {
+  background-color: #F1F5F9 !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+  border-right: 1px solid #F1F3F5 !important;
+  font-size: 13px !important;
+  padding: 12px !important;
+}
+
+.matrix-table-custom .ag-row-rekap-subtotal:hover .ag-cell {
+  background-color: #E2E8F0 !important;
+}
+
+/* GRAND TOTAL Row - Medium Gray (Same as BOQ) */
+.matrix-table-custom .ag-row-rekap-grandtotal .ag-cell {
+  background-color: #E2E8F0 !important;
+  color: #334155 !important;
+  font-weight: 700 !important;
+  border-right: 1px solid #CBD5E1 !important;
+  font-size: 13px !important;
+  padding: 12px !important;
+}
+
+.matrix-table-custom .ag-row-rekap-grandtotal:hover .ag-cell {
+  background-color: #CBD5E1 !important;
+}
+
+/* GRAND TOTAL - ROUNDED Row - Darker Gray (Same as BOQ) */
+.matrix-table-custom .ag-row-rekap-grandtotal-rounded .ag-cell {
+  background-color: #CBD5E1 !important;
+  color: #1E293B !important;
+  font-weight: 700 !important;
+  border-right: 1px solid #94A3B8 !important;
+  font-size: 13px !important;
+  padding: 12px !important;
+}
+
+.matrix-table-custom .ag-row-rekap-grandtotal-rounded:hover .ag-cell {
+  background-color: #94A3B8 !important;
+  color: #FFFFFF !important;
+}
+
+/* Expanded Row Styling - Minimalist and Professional */
+.matrix-table-custom .ag-row-group.ag-row-group-expanded {
+  background-color: #F1F5F9 !important;
+  border-left: 3px solid #64748b !important;
+}
+
+.matrix-table-custom .ag-row-group.ag-row-group-expanded:hover {
+  background-color: #E2E8F0 !important;
+}
+
+/* Child rows under expanded group - Clean white background */
+.matrix-table-custom .ag-row-level-1 {
+  background-color: #FFFFFF !important;
+}
+
+.matrix-table-custom .ag-row-level-1:hover {
+  background-color: #F8FAFC !important;
+}
+
+.matrix-table-custom .ag-row-level-1.ag-row-even {
+  background-color: #F9FAFB !important;
+}
+
+.matrix-table-custom .ag-row-level-1.ag-row-even:hover {
+  background-color: #F8FAFC !important;
+}
+
+/* Hide Scrollbars on Pinned Columns */
+.matrix-table-custom .ag-pinned-right-cols-container {
+  overflow: hidden !important;
+}
+
+.matrix-table-custom .ag-body-horizontal-scroll-viewport.ag-pinned-right-viewport {
+  overflow-x: hidden !important;
+}
+
+.matrix-table-custom .ag-horizontal-right-spacer {
+  display: none !important;
+}
+
+/* Loading State */
+.matrix-grid-loading .ag-overlay-no-rows-wrapper {
+  display: none !important;
+}
+
+.matrix-grid-loading .ag-overlay {
+  display: none !important;
+}
+
+/* Focus States - Soft (Same as BOQ) */
+.matrix-table-custom .ag-cell:focus-within {
+  outline: 2px solid #94a3b8 !important;
+  outline-offset: -2px !important;
+  background-color: #F8FAFC !important;
+}
+
+/* Table Container - Clean (Same as BOQ) */
+.matrix-table-custom {
+  border: 1px solid #E9ECEF !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+}
+
+/* SUB TOTAL Text Alignment - Left Aligned for Better Visual */
+.matrix-table-custom .ag-group-cell-entire-row .ag-cell-wrapper {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  padding-left: 8px !important;
+}
+
+.matrix-table-custom .ag-group-cell-entire-row .ag-group-value {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  padding-left: 0px !important;
+}
+
+/* More specific styling for all group cells to ensure left alignment */
+.matrix-table-custom .ag-cell.ag-group-cell-entire-row {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 8px !important;
+}
+
+/* Specific styling for SUB TOTAL rows in group column */
+.matrix-table-custom .ag-row[aria-label*="SUB TOTAL"] .ag-group-cell-entire-row,
+.matrix-table-custom .ag-row[aria-label*="SUBT TOTAL"] .ag-group-cell-entire-row {
+  text-align: left !important;
+  justify-content: flex-start !important;
+}
+
+.matrix-table-custom .ag-row[aria-label*="SUB TOTAL"] .ag-group-cell-entire-row .ag-cell-wrapper,
+.matrix-table-custom .ag-row[aria-label*="SUBT TOTAL"] .ag-group-cell-entire-row .ag-cell-wrapper {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  padding-left: 8px !important;
+}
+
+/* Manual SUB TOTAL rows styling */
+.matrix-table-custom .ag-row-total-custom .ag-group-cell-entire-row,
+.matrix-table-custom .ag-row-rekap-subtotal .ag-group-cell-entire-row {
+  text-align: left !important;
+  justify-content: flex-start !important;
+}
+
+.matrix-table-custom .ag-row-total-custom .ag-group-cell-entire-row .ag-cell-wrapper,
+.matrix-table-custom .ag-row-rekap-subtotal .ag-group-cell-entire-row .ag-cell-wrapper {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  padding-left: 8px !important;
+}
+
+/* Force left alignment for all group column content */
+.matrix-table-custom .ag-cell[col-id="ag-Grid-AutoColumn"] {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 8px !important;
+}
+
+.matrix-table-custom .ag-cell[col-id="ag-Grid-AutoColumn"] .ag-cell-wrapper {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+}

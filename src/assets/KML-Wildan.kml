@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"
+     xmlns:gx="http://www.google.com/kml/ext/2.2"
+     xmlns:kml="http://www.opengis.net/kml/2.2"
+     xmlns:atom="http://www.w3.org/2005/Atom">
+
+<Document id="1s3olkORFUrEq1Ug24KJf86wHuzYsZgLm">
+	<name>Peta tanpa judul</name>
+
+	<!-- ================= STYLE ROUTE (KUNING fbc02d) ================= -->
+	<Style id="route_fbc02d">
+		<LineStyle>
+			<color>ff2dc0fb</color>
+			<width>3</width>
+		</LineStyle>
+	</Style>
+
+	<!-- ================= STYLE BAWAAN (MERAH - JALUR UTAMA) ================= -->
+	<gx:CascadingStyle kml:id="__managed_style_2AFC5377573D3F3300F0">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/document/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LineStyle>
+				<color>ff2f2fd3</color>
+				<width>3.2</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+		</Style>
+	</gx:CascadingStyle>
+
+	<gx:CascadingStyle kml:id="__managed_style_11B1C0319B3D3F3300F0">
+		<Style>
+			<LineStyle>
+				<color>ff2f2fd3</color>
+				<width>2.13333</width>
+			</LineStyle>
+		</Style>
+	</gx:CascadingStyle>
+
+	<StyleMap id="__managed_style_0DE31794B43D3F3300F0">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#__managed_style_11B1C0319B3D3F3300F0</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#__managed_style_2AFC5377573D3F3300F0</styleUrl>
+		</Pair>
+	</StyleMap>
+
+	<Folder id="5A1C0BAE97000001">
+		<name>kml original</name>
+		<open>1</open>
+
+		<!-- ================= SPAN UTAMA (MERAH - TIDAK DIUBAH) ================= -->
+		<Placemark id="5A1C0BAE97000002">
+			<name>Jalur tanpa judul</name>
+			<styleUrl>#__managed_style_0DE31794B43D3F3300F0</styleUrl>
+			<LineString>
+				<coordinates>
+					109.2730467513862,-7.422983465068791,0
+					109.2759675363823,-7.423353396209715,0
+					109.2788037101942,-7.42376157394606,0
+				</coordinates>
+			</LineString>
+		</Placemark>
+
+		<!-- ================= SPAN ROUTE (KUNING fbc02d) ================= -->
+		<Folder id="5A1C0BAE97000003">
+			<name>SPAN SUMENEP - JT01</name>
+			<open>1</open>
+
+			<Placemark id="5A1C0BAE97000004">
+				<name>Route</name>
+				<description>Span route LineString</description>
+				<styleUrl>#route_fbc02d</styleUrl>
+				<LineString>
+					<coordinates>
+						109.2730474,-7.4229842,0
+						109.2750369,-7.423235699999999,0
+					</coordinates>
+				</LineString>
+			</Placemark>
+		</Folder>
+
+		<!-- ================= DESIGNATOR (TIDAK DIUBAH) ================= -->
+		<Folder id="5A1C0BAE97000005">
+			<name>Designator</name>
+			<open>1</open>
+
+			<Folder id="5A1C0BAE97000006">
+				<name>SPAN SUMENEP - JT01</name>
+				<open>1</open>
+
+				<Placemark id="5A1C0BAE97000007">
+					<name>SC48</name>
+					<Point>
+						<coordinates>109.2730474,-7.4229842,0</coordinates>
+					</Point>
+				</Placemark>
+
+				<Placemark id="5A1C0BAE97000008">
+					<name>DD-BM-HDPE-40-1</name>
+					<Point>
+						<coordinates>109.2740109,-7.423105499999999,0</coordinates>
+					</Point>
+				</Placemark>
+
+				<Placemark id="5A1C0BAE97000009">
+					<name>HH2</name>
+					<visibility>0</visibility>
+					<Point>
+						<coordinates>109.2750369,-7.423235699999999,0</coordinates>
+					</Point>
+				</Placemark>
+			</Folder>
+
+			<Placemark id="5A1C0BAE9700000A">
+				<name>PUAS</name>
+				<Point>
+					<coordinates>109.2757674,-7.4233302,0</coordinates>
+				</Point>
+			</Placemark>
+
+			<Placemark id="5A1C0BAE9700000B">
+				<name>HBPS1</name>
+				<Point>
+					<coordinates>109.2770651,-7.4235118,0</coordinates>
+				</Point>
+			</Placemark>
+
+			<Placemark id="5A1C0BAE9700000C">
+				<name>HH2</name>
+				<Point>
+					<coordinates>109.2788029,-7.423761200000001,0</coordinates>
+				</Point>
+			</Placemark>
+		</Folder>
+	</Folder>
+
+</Document>
+</kml>

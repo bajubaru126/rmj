@@ -1,0 +1,1534 @@
+import { useState, useEffect, useRef } from 'react';
+import { AgGridReact } from 'ag-grid-react';
+import { BlinkBlurLoader } from '@/components/ui/BlinkBlurLoader';
+import { ColDef, ModuleRegistry, themeQuartz } from 'ag-grid-community';
+import { AllEnterpriseModule } from 'ag-grid-enterprise';
+import { X, Upload, Image as ImageIcon, Trash2, Plus, Edit, FileText, Sparkles, MapPin, Ruler, Tag, Navigation, ChevronDown } from 'lucide-react';
+import maplibregl from 'maplibre-gl';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+import '@/styles/ag-grid-custom.css';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import { useRedline } from '@/hooks/useRedline';
+import { extractSpanId } from '@/services/redlineService';
+import { getAllDesignators, Designator } from '@/services/designatorService';
+
+// Register AG Grid modules
+ModuleRegistry.registerModules([AllEnterpriseModule]);
+
+interface MatrixRowData {
+  id?: string; // Span item ID from backend
+  spanId?: string; // Span ID from backend
+  spanGroup: string;
+  span: string;
+  a: string;
+  b: string;
+  length: string;
+  designator: string;
+  bcOfSm: string;
+  bcOfRg: string;
+  bcTrs: string;
+  kab: string;
+  tgb: string;
+  fo: string;
+  fsi: string;
+  pnbl: string;
+  prnl: string;
+  evidencePhotos?: string[]; // Base64 encoded images
+  longitudeA?: string;
+  latitudeA?: string;
+  longitudeB?: string;
+  latitudeB?: string;
+  soilType?: string; // Jenis tanah
+  [key: string]: string | number | string[] | undefined;
+}
+
+// Jenis tanah di Indonesia dengan warna garis
+const SOIL_TYPES = [
+  { value: 'tanah-liat', label: 'Tanah Liat (Clay)', color: '#8B4513' }, // Coklat tua
+  { value: 'tanah-berpasir', label: 'Tanah Berpasir (Sandy)', color: '#F4A460' }, // Sandy brown
+  { value: 'tanah-lempung', label: 'Tanah Lempung (Loam)', color: '#D2691E' }, // Chocolate
+  { value: 'tanah-humus', label: 'Tanah Humus (Humus)', color: '#654321' }, // Dark brown
+  { value: 'tanah-kapur', label: 'Tanah Kapur (Limestone)', color: '#F5F5DC' }, // Beige
+  { value: 'tanah-gambut', label: 'Tanah Gambut (Peat)', color: '#2F4F4F' }, // Dark slate gray
+  { value: 'tanah-laterit', label: 'Tanah Laterit (Laterite)', color: '#CD5C5C' }, // Indian red
+  { value: 'tanah-aluvial', label: 'Tanah Aluvial (Alluvial)', color: '#DAA520' }, // Goldenrod
+  { value: 'tanah-vulkanik', label: 'Tanah Vulkanik (Volcanic)', color: '#696969' }, // Dim gray
+  { value: 'tanah-podsolik', label: 'Tanah Podsolik (Podzolic)', color: '#BC8F8F' }, // Rosy brown
+];
+
+// Calculate distance between two coordinates using Haversine formula (returns meters)
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371e3; // Earth's radius in meters
+  const φ1 = (lat1 * Math.PI) / 180;
+  const φ2 = (lat2 * Math.PI) / 180;
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distance in meters
+}
+
+interface TabMatrixProps {
+  contractId?: string;
+  selectedSpan?: string | null;
+}
+
+// Component untuk menampilkan map dengan garis dari A ke B
+function SurveyLineMap({ longitudeA, latitudeA, longitudeB, latitudeB, soilType }: {
+  longitudeA: number;
+  latitudeA: number;
+  longitudeB: number;
+  latitudeB: number;
+  soilType?: string;
+}) {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+
+  // Get line color based on soil type
+  const getLineColor = () => {
+    if (!soilType) return '#3b82f6'; // Default blue
+    const soil = SOIL_TYPES.find(s => s.value === soilType);
+    return soil ? soil.color : '#3b82f6';
+  };
+
+  const lineColor = getLineColor();
+
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
+
+    // Calculate center point
+    const centerLng = (longitudeA + longitudeB) / 2;
+    const centerLat = (latitudeA + latitudeB) / 2;
+
+    try {
+      // Initialize map
+      const map = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+        center: [centerLng, centerLat],
+        zoom: 13,
+      });
+
+      mapRef.current = map;
+
+      map.on('load', () => {
+        // Add markers for Point A and B
+        new maplibregl.Marker({ color: '#22c55e' })
+          .setLngLat([longitudeA, latitudeA])
+          .setPopup(new maplibregl.Popup().setHTML('<strong>Point A</strong>'))
+          .addTo(map);
+
+        new maplibregl.Marker({ color: '#ef4444' })
+          .setLngLat([longitudeB, latitudeB])
+          .setPopup(new maplibregl.Popup().setHTML('<strong>Point B</strong>'))
+          .addTo(map);
+
+        // Add line between points
+        map.addSource('line', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: [
+                [longitudeA, latitudeA],
+                [longitudeB, latitudeB],
+              ],
+            },
+          },
+        });
+
+        map.addLayer({
+          id: 'line',
+          type: 'line',
+          source: 'line',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': lineColor,
+            'line-width': 3,
+          },
+        });
+
+        // Fit bounds to show both points
+        const bounds = new maplibregl.LngLatBounds();
+        bounds.extend([longitudeA, latitudeA]);
+        bounds.extend([longitudeB, latitudeB]);
+        map.fitBounds(bounds, { padding: 50 });
+      });
+    } catch (error) {
+      console.error('Error initializing map:', error);
+    }
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [longitudeA, latitudeA, longitudeB, latitudeB, lineColor]);
+
+  return (
+    <div
+      ref={mapContainerRef}
+      style={{ width: '100%', height: '192px' }}
+      className="rounded-lg bg-gray-100"
+    />
+  );
+}
+
+export function TabRedLine({ contractId, selectedSpan }: TabMatrixProps) {
+  const [selectedRow, setSelectedRow] = useState<MatrixRowData | null>(null);
+  const [showAddSurveyModal, setShowAddSurveyModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'manual' | 'automatic'>('automatic');
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [aiResult, setAiResult] = useState<any>(null);
+  const [surveyForm, setSurveyForm] = useState({
+    span: '',
+    designator: '',
+    length: '',
+    a: '',
+    b: '',
+    longitudeA: '',
+    latitudeA: '',
+    longitudeB: '',
+    latitudeB: '',
+    soilType: '',
+  });
+  const [evidencePhotos, setEvidencePhotos] = useState<File[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [showDesignatorDropdown, setShowDesignatorDropdown] = useState(false);
+  const [designatorSearch, setDesignatorSearch] = useState('');
+  const [showSpanDropdown, setShowSpanDropdown] = useState(false);
+  const [editingRow, setEditingRow] = useState<MatrixRowData | null>(null);
+  const [existingPhotos, setExistingPhotos] = useState<string[]>([]); // Base64 photos from existing row
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [rowToDelete, setRowToDelete] = useState<MatrixRowData | null>(null);
+  const [showSoilTypeDropdown, setShowSoilTypeDropdown] = useState(false);
+  
+  // State untuk designators dari API
+  const [designators, setDesignators] = useState<Designator[]>([]);
+  const [loadingDesignators, setLoadingDesignators] = useState<boolean>(false);
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+
+  // Fetch designators when modal opens
+  useEffect(() => {
+    if (showAddSurveyModal) {
+      fetchDesignators();
+    }
+  }, [showAddSurveyModal]);
+
+  const fetchDesignators = async () => {
+    setLoadingDesignators(true);
+    try {
+      const data = await getAllDesignators();
+      setDesignators(data);
+      console.log('✅ Loaded', data.length, 'designators');
+    } catch (error) {
+      console.error('❌ Failed to load designators:', error);
+    } finally {
+      setLoadingDesignators(false);
+    }
+  };
+
+  // Use the redline hook
+  const { spans, loading, error, createSpanItem, updateSpanItem, deleteSpanItem } = useRedline(contractId);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('📊 [TabRedLine] Component mounted/updated');
+    console.log('  Contract ID:', contractId);
+    console.log('  Spans:', spans?.length || 0);
+    console.log('  Loading:', loading);
+    console.log('  Error:', error);
+  }, [contractId, spans, loading, error]);
+
+  // Transform backend data to MatrixRowData format
+  const [allMatrixData, setAllMatrixData] = useState<MatrixRowData[]>([]);
+
+  useEffect(() => {
+    // Use dummy data if no spans from backend
+    if (!spans || spans.length === 0) {
+      const dummyData: MatrixRowData[] = [
+        // STO SUMENEP - sesuai gambar referensi
+        { spanGroup: 'STO SUMENEP', span: '1', a: '0', b: '1', length: '1', designator: 'TC48', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.8583', latitudeA: '-7.0167', longitudeB: '113.8584', latitudeB: '-7.0168', soilType: 'tanah-liat' },
+        { spanGroup: 'STO SUMENEP', span: '2', a: '1', b: '1', length: '15', designator: 'SLACK-T', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.8584', latitudeA: '-7.0168', longitudeB: '113.8595', latitudeB: '-7.0179', soilType: 'tanah-berpasir' },
+        { spanGroup: 'STO SUMENEP', span: '3', a: '1', b: '16', length: '15', designator: 'PP-IN', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.8595', latitudeA: '-7.0179', longitudeB: '113.8606', latitudeB: '-7.0190', soilType: 'tanah-lempung' },
+        { spanGroup: 'STO SUMENEP', span: '4', a: '16', b: '31', length: '15', designator: 'DD-BM-HDPE-40-1', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.8606', latitudeA: '-7.0190', longitudeB: '113.8617', latitudeB: '-7.0201', soilType: 'tanah-humus' },
+        { spanGroup: 'STO SUMENEP', span: '5', a: '31', b: '35', length: '4', designator: 'BC-TR-S-4', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.8617', latitudeA: '-7.0201', longitudeB: '113.8621', latitudeB: '-7.0205', soilType: 'tanah-kapur' },
+        { spanGroup: 'STO SUMENEP', span: '6', a: '35', b: '43', length: '8', designator: 'BM1', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.8621', latitudeA: '-7.0205', longitudeB: '113.8629', latitudeB: '-7.0213', soilType: 'tanah-gambut' },
+        { spanGroup: 'STO SUMENEP', span: '7', a: '43', b: '54', length: '11', designator: 'DD-BM-HDPE-40-1', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.8629', latitudeA: '-7.0213', longitudeB: '113.8640', latitudeB: '-7.0224', soilType: 'tanah-laterit' },
+        { spanGroup: 'STO SUMENEP', span: '8', a: '54', b: '207', length: '153', designator: 'DD-BM-HDPE-40-1', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.8640', latitudeA: '-7.0224', longitudeB: '113.8793', latitudeB: '-7.0377', soilType: 'tanah-aluvial' },
+        { spanGroup: 'STO SUMENEP', span: '9', a: '207', b: '213', length: '6', designator: 'BC-TR-S-3', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.8793', latitudeA: '-7.0377', longitudeB: '113.8799', latitudeB: '-7.0383', soilType: 'tanah-vulkanik' },
+        { spanGroup: 'STO SUMENEP', span: '10', a: '213', b: '425', length: '212', designator: 'DD-BM-HDPE-40-1', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.8799', latitudeA: '-7.0383', longitudeB: '113.9011', latitudeB: '-7.0595', soilType: 'tanah-podsolik' },
+        { spanGroup: 'STO SUMENEP', span: '11', a: '425', b: '439', length: '14', designator: 'BM1', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.9011', latitudeA: '-7.0595', longitudeB: '113.9025', latitudeB: '-7.0609', soilType: 'tanah-liat' },
+        { spanGroup: 'STO SUMENEP', span: '12', a: '439', b: '468', length: '29', designator: 'DD-BM-HDPE-40-68', bcOfSm: '-', bcOfRg: '-', bcTrs: '-', kab: '-', tgb: '-', fo: '-', fsi: '-', pnbl: '-', prnl: '-', longitudeA: '113.9025', latitudeA: '-7.0609', longitudeB: '113.9054', latitudeB: '-7.0638', soilType: 'tanah-berpasir' },
+      ];
+      
+      console.log('✅ [TabRedLine] Using dummy data:', dummyData.length, 'rows');
+      setAllMatrixData(dummyData);
+      return;
+    }
+
+    // Use real data from backend
+    if (spans && spans.length > 0) {
+      const transformedData: MatrixRowData[] = [];
+
+      spans.forEach((span) => {
+        const spanName = span.span_name; // e.g., "JT06-JT07"
+
+        // If span has span_items, display them
+        if (span.span_items && span.span_items.length > 0) {
+          span.span_items.forEach((item, index) => {
+            transformedData.push({
+              id: extractSpanId(item.id),
+              spanId: extractSpanId(span.id),
+              spanGroup: spanName,
+              span: (index + 1).toString(),
+              a: item.distance_from.toString(),
+              b: item.distance_to.toString(),
+              length: (item.distance_to - item.distance_from).toString(),
+              designator: item.item_name,
+              bcOfSm: '-',
+              bcOfRg: '-',
+              bcTrs: '-',
+              kab: '-',
+              tgb: '-',
+              fo: '-',
+              fsi: '-',
+              pnbl: '-',
+              prnl: '-',
+              evidencePhotos: item.evidence_photos || [],
+              longitudeA: item.longitude_from.toString(),
+              latitudeA: item.latitude_from.toString(),
+              longitudeB: item.longitude_to.toString(),
+              latitudeB: item.latitude_to.toString(),
+              soilType: item.soil_type,
+            });
+          });
+        } else {
+          // If no span_items, show the span itself with geometry data
+          const geometry = span.geometry;
+          let longitudeA = '';
+          let latitudeA = '';
+          let longitudeB = '';
+          let latitudeB = '';
+          let length = '-';
+
+          if (geometry && geometry.type === 'LineString' && geometry.coordinates && geometry.coordinates.length >= 2) {
+            const firstCoord = geometry.coordinates[0];
+            const lastCoord = geometry.coordinates[geometry.coordinates.length - 1];
+            
+            longitudeA = firstCoord[0]?.toString() || '';
+            latitudeA = firstCoord[1]?.toString() || '';
+            longitudeB = lastCoord[0]?.toString() || '';
+            latitudeB = lastCoord[1]?.toString() || '';
+
+            // Calculate approximate length from all coordinates (in meters)
+            if (geometry.coordinates.length > 1) {
+              let totalDistance = 0;
+              for (let i = 0; i < geometry.coordinates.length - 1; i++) {
+                const [lon1, lat1] = geometry.coordinates[i];
+                const [lon2, lat2] = geometry.coordinates[i + 1];
+                const distance = calculateDistance(lat1, lon1, lat2, lon2);
+                totalDistance += distance;
+              }
+              length = Math.round(totalDistance).toString();
+            }
+          }
+
+          transformedData.push({
+            id: extractSpanId(span.id),
+            spanId: extractSpanId(span.id),
+            spanGroup: spanName,
+            span: '1',
+            a: '0',
+            b: length !== '-' ? length : '0',
+            length: length,
+            designator: spanName,
+            bcOfSm: '-',
+            bcOfRg: '-',
+            bcTrs: '-',
+            kab: '-',
+            tgb: '-',
+            fo: '-',
+            fsi: '-',
+            pnbl: '-',
+            prnl: '-',
+            evidencePhotos: [],
+            longitudeA,
+            latitudeA,
+            longitudeB,
+            latitudeB,
+            soilType: undefined,
+          });
+        }
+      });
+
+      console.log('✅ [TabRedLine] Transformed', transformedData.length, 'rows for table');
+      setAllMatrixData(transformedData);
+    }
+  }, [spans]);
+
+  // Get unique designators for autocomplete
+  const uniqueDesignators = Array.from(new Set(allMatrixData.map(item => item.designator)));
+
+  // Filter designators based on search
+  const filteredDesignators = uniqueDesignators.filter(designator =>
+    designator.toLowerCase().includes(designatorSearch.toLowerCase())
+  );
+
+  // Actions Cell Renderer - sama seperti TabBOQ
+  const ActionsCellRenderer = (params: any) => {
+    // Don't show actions for group rows
+    if (params.node.group) return null;
+
+    return (
+      <div className="flex items-center justify-center gap-1">
+        <button
+          className="p-1 hover:bg-gray-200 rounded"
+          title="Edit"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleEditRow(params.data);
+          }}
+        >
+          <Edit className="w-4 h-4 text-blue-600" />
+        </button>
+        <button
+          className="p-1 hover:bg-gray-200 rounded"
+          title="Delete"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteRow(params.data);
+          }}
+        >
+          <Trash2 className="w-4 h-4 text-red-600" />
+        </button>
+      </div>
+    );
+  };
+
+  // Column definitions
+  const columnDefs: ColDef[] = [
+    {
+      field: 'spanGroup',
+      headerName: 'SPAN',
+      width: 200,
+      rowGroup: true,
+      hide: true,
+    },
+    { field: 'span', headerName: 'No', width: 60, cellStyle: { textAlign: 'center' } },
+    { field: 'a', headerName: 'A (m)', width: 100, cellStyle: { textAlign: 'center' } },
+    { field: 'b', headerName: 'B (m)', width: 100, cellStyle: { textAlign: 'center' } },
+    { field: 'length', headerName: 'Length (m)', width: 120, cellStyle: { textAlign: 'center' } },
+    { field: 'designator', headerName: 'Designator', width: 200 },
+    { field: 'bcOfSm', headerName: 'BC of SM', width: 120, cellStyle: { textAlign: 'center' } },
+    { field: 'bcOfRg', headerName: 'BC of RG', width: 120, cellStyle: { textAlign: 'center' } },
+    { field: 'bcTrs', headerName: 'BC TRS', width: 120, cellStyle: { textAlign: 'center' } },
+    { field: 'kab', headerName: 'KAB', width: 100, cellStyle: { textAlign: 'center' } },
+    { field: 'tgb', headerName: 'TGB', width: 100, cellStyle: { textAlign: 'center' } },
+    { field: 'fo', headerName: 'FO', width: 100, cellStyle: { textAlign: 'center' } },
+    { field: 'fsi', headerName: 'FSI', width: 100, cellStyle: { textAlign: 'center' } },
+    { field: 'pnbl', headerName: 'PNBL', width: 100, cellStyle: { textAlign: 'center' } },
+    { field: 'prnl', headerName: 'PRNL', width: 100, cellStyle: { textAlign: 'center' } },
+    {
+      field: 'actions',
+      headerName: 'ACTION',
+      width: 120,
+      pinned: 'right',
+      cellRenderer: ActionsCellRenderer,
+      cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' } as any,
+      sortable: false,
+      filter: false,
+      resizable: false,
+      suppressSizeToFit: true,
+    },
+  ];
+
+  const handleEditRow = (row: MatrixRowData) => {
+    setEditingRow(row);
+    setSurveyForm({
+      span: row.spanGroup,
+      designator: row.designator,
+      length: row.length,
+      a: row.a,
+      b: row.b,
+      longitudeA: row.longitudeA || '',
+      latitudeA: row.latitudeA || '',
+      longitudeB: row.longitudeB || '',
+      latitudeB: row.latitudeB || '',
+      soilType: row.soilType || '',
+    });
+    // Load existing photos
+    setExistingPhotos(row.evidencePhotos || []);
+    setEvidencePhotos([]);
+    setShowAddSurveyModal(true);
+  };
+
+  const handleDeleteRow = (row: MatrixRowData) => {
+    setRowToDelete(row);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!rowToDelete || !rowToDelete.id) return;
+
+    try {
+      await deleteSpanItem(rowToDelete.id);
+
+      // Close detail panel if deleted row was selected
+      if (selectedRow?.id === rowToDelete.id) {
+        setSelectedRow(null);
+      }
+
+      setShowDeleteConfirm(false);
+      setRowToDelete(null);
+    } catch (error) {
+      console.error('Error deleting span item:', error);
+      alert('Failed to delete survey: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setEvidencePhotos([...evidencePhotos, ...newFiles]);
+    }
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    setEvidencePhotos(evidencePhotos.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveExistingPhoto = (index: number) => {
+    setExistingPhotos(existingPhotos.filter((_, i) => i !== index));
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+    if (files.length > 0) {
+      setEvidencePhotos([...evidencePhotos, ...files]);
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      console.log('📤 File selected:', file.name, file.size, 'bytes', file.type);
+      // Langsung trigger AI analysis
+      console.log('🚀 Calling handleProcessAI...');
+      handleProcessAI(file);
+    }
+  };
+
+  const handleProcessAI = async (file: File) => {
+    console.log('🤖 handleProcessAI called with file:', file.name);
+    setIsProcessing(true);
+    console.log('⏳ isProcessing set to TRUE');
+    setAiResult(null);
+
+    try {
+      console.log('📦 Importing services...');
+      const { aiService } = await import('@/services/aiService');
+      const { authService } = await import('@/services/authService');
+      
+      const token = authService.getToken();
+      console.log('🔑 Token obtained:', token ? 'YES' : 'NO');
+      
+      console.log('📡 Calling aiService.analyzeImage...');
+      const response = await aiService.analyzeImage(file, token);
+      
+      console.log('🤖 AI Response:', response);
+      
+      if (response.success && response.result) {
+        console.log('✅ Success - Result:', response.result);
+        
+        // Map API response to component format
+        const mappedResult = {
+          catatan: response.result.catatan,
+          gps_coordinates: response.result.lokasi?.koordinat ? {
+            latitude: response.result.lokasi.koordinat.latitude || '',
+            longitude: response.result.lokasi.koordinat.longitude || ''
+          } : undefined,
+          lokasi: response.result.lokasi?.alamat || ''
+        };
+        
+        console.log('📊 Mapped result:', mappedResult);
+        setAiResult(mappedResult);
+      } else {
+        console.log('❌ Failed - Error:', response.error);
+        setAiResult({ error: response.error || 'Analysis failed' });
+      }
+    } catch (error) {
+      console.error('❌ Error in handleProcessAI:', error);
+      setAiResult({ error: error instanceof Error ? error.message : 'Unknown error occurred' });
+    } finally {
+      console.log('✅ isProcessing set to FALSE');
+      setIsProcessing(false);
+    }
+  };
+
+  const handleAddSurvey = async () => {
+    try {
+      // Validasi form
+      if (!surveyForm.span || !surveyForm.designator || !surveyForm.length || !surveyForm.a || !surveyForm.b) {
+        alert('Please fill in all required fields (SPAN, Designator, Length, A, B)');
+        return;
+      }
+
+      if (!surveyForm.longitudeA || !surveyForm.latitudeA || !surveyForm.longitudeB || !surveyForm.latitudeB) {
+        alert('Please fill in all coordinate fields (Longitude A, Latitude A, Longitude B, Latitude B)');
+        return;
+      }
+
+      console.log('Starting survey save...', { editingRow, surveyForm });
+
+      // Convert new images to base64 with compression
+      const newBase64Images: string[] = [];
+      for (const file of evidencePhotos) {
+        const base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const img = new Image();
+            img.onload = () => {
+              // Compress image to max 800px width
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+
+              let width = img.width;
+              let height = img.height;
+              const maxWidth = 800;
+
+              if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              ctx?.drawImage(img, 0, 0, width, height);
+
+              // Convert to base64 with quality 0.7
+              const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+              resolve(compressedBase64);
+            };
+            img.src = reader.result as string;
+          };
+          reader.readAsDataURL(file);
+        });
+        newBase64Images.push(base64);
+      }
+
+      // Combine existing photos with new photos
+      const allPhotos = [...existingPhotos, ...newBase64Images];
+      console.log('Photos combined:', { existing: existingPhotos.length, new: newBase64Images.length, total: allPhotos.length });
+
+      // Find the span ID based on span name
+      const targetSpan = spans.find(s => s.span_name === surveyForm.span);
+      if (!targetSpan) {
+        alert('Selected SPAN not found');
+        return;
+      }
+
+      const spanId = extractSpanId(targetSpan.id);
+
+      if (editingRow && editingRow.id) {
+        // Edit mode - update existing row
+        console.log('Edit mode - updating row:', editingRow);
+
+        await updateSpanItem(editingRow.id, {
+          item_name: surveyForm.designator,
+          distance_from: parseFloat(surveyForm.a),
+          distance_to: parseFloat(surveyForm.b),
+          latitude_from: parseFloat(surveyForm.latitudeA),
+          longitude_from: parseFloat(surveyForm.longitudeA),
+          latitude_to: parseFloat(surveyForm.latitudeB),
+          longitude_to: parseFloat(surveyForm.longitudeB),
+          soil_type: surveyForm.soilType || undefined,
+          evidence_photos: allPhotos,
+        });
+
+        console.log('Survey updated successfully');
+      } else {
+        // Add mode - create new row
+        console.log('Add mode - creating new span item');
+
+        await createSpanItem(spanId, {
+          item_name: surveyForm.designator,
+          distance_from: parseFloat(surveyForm.a),
+          distance_to: parseFloat(surveyForm.b),
+          latitude_from: parseFloat(surveyForm.latitudeA),
+          longitude_from: parseFloat(surveyForm.longitudeA),
+          latitude_to: parseFloat(surveyForm.latitudeB),
+          longitude_to: parseFloat(surveyForm.longitudeB),
+          soil_type: surveyForm.soilType || undefined,
+          evidence_photos: allPhotos,
+        });
+
+        console.log('Survey added successfully');
+      }
+
+      // Close modal and reset form
+      setShowAddSurveyModal(false);
+      setSurveyForm({ span: '', designator: '', length: '', a: '', b: '', longitudeA: '', latitudeA: '', longitudeB: '', latitudeB: '', soilType: '' });
+      setEvidencePhotos([]);
+      setExistingPhotos([]);
+      setEditingRow(null);
+      console.log('Survey save completed successfully');
+    } catch (error) {
+      console.error('Error saving survey:', error);
+      alert('Error saving survey: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  };
+
+  const handleClose = () => {
+    setSurveyForm({
+      span: '',
+      designator: '',
+      length: '',
+      a: '',
+      b: '',
+      longitudeA: '',
+      latitudeA: '',
+      longitudeB: '',
+      latitudeB: '',
+      soilType: '',
+    });
+    setAiResult(null);
+    setIsProcessing(false);
+    setActiveTab('automatic'); // Reset to AI Analysis tab
+    setEvidencePhotos([]);
+    setExistingPhotos([]);
+    setEditingRow(null);
+    setShowAddSurveyModal(false);
+    setShowDropdown(false);
+  };
+
+  const handleSubmit = () => {
+    // Just call the existing handleAddSurvey function
+    handleAddSurvey();
+  };
+
+  return (
+    <div className="flex h-full gap-2">
+      {error && (
+        <div className="absolute top-4 right-4 bg-red-50 border border-red-200 rounded-lg p-4 z-20 max-w-md">
+          <div className="flex items-start gap-2">
+            <div className="text-red-600">⚠️</div>
+            <div>
+              <p className="text-sm font-medium text-red-800">Error loading redline data</p>
+              <p className="text-xs text-red-600 mt-1">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className={`flex-1 bg-white rounded-lg shadow-sm`} style={{ height: '600px' }}>
+        {!selectedSpan && (
+          <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold" style={{ fontWeight: 600 }}>RedLine Data</h3>
+                <p className="text-xs text-gray-400 mt-1">
+                  {loading ? 'Loading redline data from API...' : 'Expand/collapse SPAN groups. Click row to view details.'}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAddSurveyModal(true)}
+                disabled={loading}
+                style={{
+                  background: loading ? 'linear-gradient(135deg, rgba(156, 163, 175, 0.9) 0%, rgba(107, 114, 128, 0.9) 100%)' : 'linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  color: 'white',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 8px 32px 0 rgba(239, 68, 68, 0.37)',
+                  transition: 'all 0.3s ease',
+                  opacity: loading ? 0.6 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 12px 40px 0 rgba(239, 68, 68, 0.5)';
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 1) 0%, rgba(220, 38, 38, 1) 100%)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 8px 32px 0 rgba(239, 68, 68, 0.37)';
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%)';
+                  }
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                Add Survey
+              </button>
+            </div>
+          </div>
+        )}
+        <div className="ag-theme-quartz" style={{ height: selectedSpan ? '100%' : 'calc(100% - 100px)', width: '100%' }}>
+          <style>{`
+            .ag-theme-quartz .ag-row-group {
+              background-color: #EFF6FF !important;
+              font-weight: 600;
+              color: #1E40AF;
+            }
+            .ag-theme-quartz .ag-row-group:hover {
+              background-color: #DBEAFE !important;
+            }
+            .ag-theme-quartz .ag-row {
+              border-bottom: 1px solid #E5E7EB;
+            }
+            .ag-theme-quartz .ag-row:hover {
+              background-color: #F9FAFB !important;
+            }
+            .ag-theme-quartz .ag-cell {
+              font-size: 13px;
+              color: #1F2937;
+            }
+            /* Remove indentation for child rows */
+            .ag-theme-quartz .ag-row-level-1 .ag-cell {
+              padding-left: 12px !important;
+            }
+            .ag-theme-quartz .ag-row-group-indent-1 {
+              padding-left: 0 !important;
+            }
+            .ag-theme-quartz .ag-group-contracted,
+            .ag-theme-quartz .ag-group-expanded {
+              margin-right: 8px !important;
+            }
+            /* NUCLEAR OPTION: Remove ALL possible outlines and borders on focus */
+            .ag-theme-quartz .ag-row:focus,
+            .ag-theme-quartz .ag-row:focus-within,
+            .ag-theme-quartz .ag-row-group:focus,
+            .ag-theme-quartz .ag-row-group:focus-within,
+            .ag-theme-quartz .ag-cell:focus,
+            .ag-theme-quartz .ag-cell:focus-within,
+            .ag-theme-quartz .ag-group-expanded:focus,
+            .ag-theme-quartz .ag-group-contracted:focus {
+              outline: 0 !important;
+              outline-width: 0 !important;
+              outline-style: none !important;
+              outline-color: transparent !important;
+              border: none !important;
+              box-shadow: none !important;
+            }
+            .ag-theme-quartz .ag-row.ag-row-focus,
+            .ag-theme-quartz .ag-row.ag-row-focus .ag-cell,
+            .ag-theme-quartz .ag-cell.ag-cell-focus,
+            .ag-theme-quartz .ag-row-group.ag-row-focus,
+            .ag-theme-quartz .ag-row-group.ag-row-focus .ag-cell {
+              outline: 0 !important;
+              outline-width: 0 !important;
+              border: none !important;
+              box-shadow: none !important;
+            }
+            .ag-theme-quartz *:focus,
+            .ag-theme-quartz *:focus-visible,
+            .ag-theme-quartz *:focus-within {
+              outline: 0 !important;
+              outline-width: 0 !important;
+              box-shadow: none !important;
+            }
+            /* Specifically target the row group cell */
+            .ag-theme-quartz .ag-row-group .ag-cell,
+            .ag-theme-quartz .ag-row-group .ag-cell:focus,
+            .ag-theme-quartz .ag-row-group.ag-row-focus .ag-cell {
+              outline: 0 !important;
+              outline-width: 0 !important;
+              border-top: none !important;
+              border-left: none !important;
+              border-right: none !important;
+              box-shadow: none !important;
+            }
+          `}</style>
+          {loading ? (
+            <div className="flex items-center justify-center" style={{ minHeight: '500px' }}>
+              <BlinkBlurLoader size="md" text="Loading redline data..." color="multicolor" />
+            </div>
+          ) : allMatrixData.length === 0 ? (
+            <div className="flex items-center justify-center" style={{ minHeight: '500px' }}>
+              <div className="text-center">
+                <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Redline Data</h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  No span items found for this project.<br />
+                  Click "Add Survey" to create new entries.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="p-6">
+              <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
+                <table className="border-collapse w-full">
+                  <tbody>
+                    {/* Row 1: B values */}
+                    <tr className="bg-gray-50">
+                      <td className="border border-gray-300 px-6 py-3 w-48 font-medium text-gray-700 text-sm">
+                        
+                      </td>
+                      {allMatrixData.map((item, idx) => (
+                        <td 
+                          key={idx}
+                          className="border border-gray-300 px-4 py-3 text-center text-gray-900 text-sm font-semibold whitespace-nowrap"
+                        >
+                          {item.b}
+                        </td>
+                      ))}
+                    </tr>
+                    
+                    {/* Row 2: Span Group + Designators */}
+                    <tr>
+                      <td className="border border-gray-300 bg-gray-50 px-6 py-3 font-semibold text-gray-900 text-sm">
+                        {allMatrixData.length > 0 ? allMatrixData[0].spanGroup : 'STO SUMENEP'}
+                      </td>
+                      {allMatrixData.map((item, idx) => (
+                        <td 
+                          key={idx}
+                          className="border border-gray-300 px-4 py-3 text-center text-gray-900 text-sm whitespace-nowrap"
+                        >
+                          {item.designator}
+                        </td>
+                      ))}
+                    </tr>
+                    
+                    {/* Row 3: Lengths */}
+                    <tr className="bg-gray-50">
+                      <td className="border border-gray-300 px-6 py-3">
+                        
+                      </td>
+                      {allMatrixData.map((item, idx) => (
+                        <td 
+                          key={idx}
+                          className="border border-gray-300 px-4 py-3 text-center text-gray-900 text-sm whitespace-nowrap"
+                        >
+                          {item.length}
+                        </td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {selectedRow && (
+        <div className="w-80 bg-white border border-gray-200 shadow-lg flex flex-col rounded-lg" style={{ height: '600px' }}>
+          <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-[#003A70] to-[#005EB8]">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-white text-sm font-semibold">Row Detail</h3>
+                <p className="text-xs text-blue-100 mt-1">Row {selectedRow.span} - {selectedRow.designator}</p>
+              </div>
+              <button
+                onClick={() => setSelectedRow(null)}
+                className="p-1 hover:bg-white/10 rounded transition-colors"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="text-xs font-semibold text-gray-700 mb-3">Matrix Information</h4>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Row #:</span>
+                  <span className="text-gray-900 font-medium">{selectedRow.span}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">A:</span>
+                  <span className="text-gray-900 font-medium">{selectedRow.a}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">B:</span>
+                  <span className="text-gray-900 font-medium">{selectedRow.b}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Length:</span>
+                  <span className="text-gray-900 font-medium">{selectedRow.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Designator:</span>
+                  <span className="text-gray-900 font-medium">{selectedRow.designator}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">BC-OF-SM:</span>
+                  <span className="text-gray-900 font-medium">{selectedRow.bcOfSm}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">KAB:</span>
+                  <span className="text-gray-900 font-medium">{selectedRow.kab}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="text-xs font-semibold text-gray-700 mb-3">Evidence Photos</h4>
+              {selectedRow.evidencePhotos && selectedRow.evidencePhotos.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2">
+                  {selectedRow.evidencePhotos.map((photo, index) => (
+                    <div key={index} className="relative rounded-lg overflow-hidden border border-gray-200">
+                      <img
+                        src={photo}
+                        alt={`Evidence ${index + 1}`}
+                        className="w-full h-24 object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                  <p className="text-xs text-gray-400">No evidence photos</p>
+                </div>
+              )}
+            </div>
+
+            {/* Map with Line from A to B */}
+            {selectedRow.longitudeA && selectedRow.latitudeA && selectedRow.longitudeB && selectedRow.latitudeB && (
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-xs font-semibold text-gray-700 mb-3">Location Map</h4>
+                <SurveyLineMap
+                  longitudeA={parseFloat(selectedRow.longitudeA)}
+                  latitudeA={parseFloat(selectedRow.latitudeA)}
+                  longitudeB={parseFloat(selectedRow.longitudeB)}
+                  latitudeB={parseFloat(selectedRow.latitudeB)}
+                  soilType={selectedRow.soilType}
+                />
+                <div className="mt-2 bg-white px-3 py-2 rounded text-xs border border-gray-200">
+                  <div className="text-gray-600">Point A: {selectedRow.latitudeA}, {selectedRow.longitudeA}</div>
+                  <div className="text-gray-600">Point B: {selectedRow.latitudeB}, {selectedRow.longitudeB}</div>
+                  {selectedRow.soilType && (
+                    <div className="text-gray-600 mt-1">
+                      Soil Type: <span className="font-medium">{SOIL_TYPES.find(s => s.value === selectedRow.soilType)?.label || selectedRow.soilType}</span>
+                      <span
+                        className="inline-block w-4 h-4 ml-2 rounded"
+                        style={{ backgroundColor: SOIL_TYPES.find(s => s.value === selectedRow.soilType)?.color || '#3b82f6' }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit Survey Modal */}
+      {showAddSurveyModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
+          <div
+            className="shadow-2xl flex flex-col relative"
+            style={{
+              width: '600px',
+              height: '700px',
+              borderRadius: '16px',
+              overflow: 'hidden',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              background: activeTab === 'automatic' ? '#0a0e27' : '#ffffff',
+              backdropFilter: activeTab === 'automatic' ? 'blur(10px)' : 'none'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Space Background Animation for Automatic Tab */}
+            {activeTab === 'automatic' && (
+              <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
+                <div className="stars"></div>
+                <div className="stars2"></div>
+                <div className="stars3"></div>
+              </div>
+            )}
+
+            {/* Modal Header */}
+            <div
+              className="p-6 flex items-center justify-between relative"
+              style={{
+                background: activeTab === 'automatic'
+                  ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)'
+                  : 'linear-gradient(135deg, rgba(249, 115, 22, 0.95) 0%, rgba(234, 88, 12, 0.95) 100%)',
+                backdropFilter: 'blur(10px)',
+                flexShrink: 0,
+                zIndex: 10
+              }}
+            >
+              <div className="relative">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  {activeTab === 'automatic' && <Sparkles className="w-5 h-5" />}
+                  Add Survey
+                </h3>
+                <p className="text-sm text-white mt-1">
+                  {activeTab === 'manual' ? 'Add survey item manually' : 'AI-powered span item detection'}
+                </p>
+              </div>
+              <button
+                onClick={handleClose}
+                className="p-2 hover:bg-white/20 rounded-lg transition-all relative"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+
+            {/* Tabs - HIDDEN, only AI Analysis is used */}
+            {/* <div
+              className="flex border-b relative z-20"
+              style={{
+                background: 'transparent',
+                borderColor: activeTab === 'automatic' ? '#374151' : '#e5e7eb'
+              }}
+            >
+              <button
+                onClick={() => setActiveTab('manual')}
+                className="flex-1 px-6 py-4 text-sm font-medium transition-all relative z-20"
+                style={{
+                  background: activeTab === 'manual' ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
+                  color: activeTab === 'manual'
+                    ? '#1f2937'
+                    : (activeTab === 'automatic' ? '#9ca3af' : '#6b7280'),
+                  borderBottom: activeTab === 'manual' ? '2px solid #f97316' : 'none'
+                }}
+              >
+                Manual Entry
+              </button>
+              <button
+                onClick={() => setActiveTab('automatic')}
+                className="flex-1 px-6 py-4 text-sm font-medium transition-all flex items-center justify-center gap-2 relative z-20"
+                style={{
+                  background: activeTab === 'automatic' ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
+                  color: activeTab === 'automatic'
+                    ? '#ffffff'
+                    : (activeTab === 'manual' ? '#6b7280' : '#9ca3af'),
+                  borderBottom: activeTab === 'automatic' ? '2px solid #ffffff' : 'none'
+                }}
+              >
+                <Sparkles className="w-4 h-4" />
+                AI Analysis
+              </button>
+            </div> */}
+
+            {/* Modal Body - AI Analysis Only */}
+            <div
+              className="p-6 relative flex flex-col"
+              style={{
+                background: 'transparent',
+                overflowY: 'auto',
+                flexShrink: 1,
+                flexGrow: 1,
+                zIndex: 5,
+                minHeight: '0'
+              }}
+            >
+              {/* AI Analysis - Always shown */}
+              <div className="space-y-2 flex flex-col h-full">
+                {/* Upload Area - SMALLER */}
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  className="border-2 border-dashed rounded-xl text-center transition-all cursor-pointer flex-shrink-0"
+                  style={{
+                      background: isDragging
+                        ? 'rgba(168, 85, 247, 0.15)'
+                        : 'rgba(255, 255, 255, 0.08)',
+                      borderColor: isDragging ? '#a855f7' : 'rgba(255, 255, 255, 0.2)',
+                      borderWidth: '2px',
+                      borderStyle: 'dashed',
+                      padding: '16px'
+                    }}
+                    onClick={() => !isProcessing && document.getElementById('span-image-upload')?.click()}
+                  >
+                    <input
+                      id="span-image-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={isProcessing}
+                    />
+
+                    <Upload className="w-8 h-8 text-white mx-auto mb-1" />
+                    <p className="text-white font-medium text-xs mb-0.5">Upload SPAN Image</p>
+                    <p className="text-gray-400 text-xs">Click or drag & drop</p>
+                  </div>
+
+                  {/* AI Analysis Result - LARGER */}
+                  <div
+                    className="border rounded-xl backdrop-blur-sm flex flex-col flex-grow overflow-hidden"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      borderColor: 'rgba(255, 255, 255, 0.2)',
+                      borderWidth: '1px',
+                      minHeight: '0'
+                    }}
+                  >
+                    <div className="p-3 border-b flex-shrink-0" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
+                      <h4 className="text-white font-semibold flex items-center gap-2 text-sm">
+                        <Sparkles className="w-4 h-4 text-white" />
+                        AI Analysis Result
+                      </h4>
+                    </div>
+
+                    <div className="flex-grow overflow-y-auto p-3">
+                      {isProcessing ? (
+                        <div className="flex flex-col items-center justify-center h-full">
+                          <BlinkBlurLoader size="sm" />
+                          <p className="text-white font-medium text-xs mb-0.5 mt-4">Analyzing Image</p>
+                          <p className="text-gray-400 text-xs">Please wait...</p>
+                        </div>
+                      ) : aiResult ? (
+                        aiResult.error ? (
+                          <div className="rounded-lg p-3 border" style={{
+                            background: 'rgba(239, 68, 68, 0.1)',
+                            borderColor: 'rgba(239, 68, 68, 0.3)'
+                          }}>
+                            <div className="flex items-start gap-2">
+                              <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{
+                                background: 'rgba(239, 68, 68, 0.2)'
+                              }}>
+                                <X className="w-4 h-4 text-red-400" />
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-semibold text-xs mb-1" style={{ color: '#ffffff' }}>Analysis Failed</p>
+                                <p className="text-xs leading-relaxed" style={{ color: '#fecaca' }}>{aiResult.error}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {/* Success Badge - COMPACT */}
+                            <div className="flex items-center gap-2 mb-2 p-2 rounded-lg" style={{ background: 'rgba(34, 197, 94, 0.1)' }}>
+                              <Sparkles className="w-4 h-4 text-white flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-white font-semibold text-xs truncate">Information extracted successfully</p>
+                              </div>
+                            </div>
+
+                            {/* Check if we have any data to display */}
+                            {!aiResult.catatan?.segmen && !aiResult.catatan?.jarak && !aiResult.catatan?.kode && !aiResult.gps_coordinates && !aiResult.lokasi ? (
+                              <div className="rounded-lg p-4 border text-center" style={{
+                                background: 'rgba(245, 158, 11, 0.1)',
+                                borderColor: 'rgba(245, 158, 11, 0.3)'
+                              }}>
+                                <Sparkles className="w-8 h-8 text-amber-400 mx-auto mb-2" />
+                                <p className="text-amber-400 font-semibold text-xs mb-1">No Data Extracted</p>
+                                <p className="text-gray-400 text-xs">Please try uploading a clearer image.</p>
+                              </div>
+                            ) : null}
+
+                            {/* Segment Info - COMPACT */}
+                            {aiResult.catatan?.segmen && (
+                              <div
+                                className="flex items-center gap-2 rounded-lg p-2 transition-all hover:bg-white/5"
+                                style={{
+                                  background: 'rgba(255, 255, 255, 0.05)',
+                                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                                }}
+                              >
+                                <Tag className="w-4 h-4 text-white flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-gray-400">Segment Name</p>
+                                  <p className="text-white font-semibold text-xs truncate">{aiResult.catatan.segmen}</p>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Distance - COMPACT */}
+                            {aiResult.catatan?.jarak && (
+                              <div
+                                className="flex items-center gap-2 rounded-lg p-2 transition-all hover:bg-white/5"
+                                style={{
+                                  background: 'rgba(255, 255, 255, 0.05)',
+                                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                                }}
+                              >
+                                <Ruler className="w-4 h-4 text-white flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-gray-400">Distance / Length</p>
+                                  <p className="text-white font-semibold text-xs truncate">{aiResult.catatan.jarak}</p>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Code - COMPACT */}
+                            {aiResult.catatan?.kode && (
+                              <div
+                                className="flex items-center gap-2 rounded-lg p-2 transition-all hover:bg-white/5"
+                                style={{
+                                  background: 'rgba(255, 255, 255, 0.05)',
+                                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                                }}
+                              >
+                                <Tag className="w-4 h-4 text-white flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-gray-400">Designator Code</p>
+                                  <p className="text-white font-semibold text-xs truncate">{aiResult.catatan.kode}</p>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* GPS Coordinates - COMPACT */}
+                            {aiResult.gps_coordinates && (
+                              <div
+                                className="rounded-lg p-2 transition-all hover:bg-white/5"
+                                style={{
+                                  background: 'rgba(255, 255, 255, 0.05)',
+                                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                                }}
+                              >
+                                <div className="flex items-center gap-2 mb-1.5">
+                                  <Navigation className="w-4 h-4 text-white flex-shrink-0" />
+                                  <p className="text-xs text-gray-400">GPS Coordinates</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 pl-6">
+                                  <div className="rounded px-2 py-1" style={{ background: 'rgba(255, 255, 255, 0.03)' }}>
+                                    <p className="text-xs text-gray-500">Lat</p>
+                                    <p className="text-white text-xs font-mono truncate">{aiResult.gps_coordinates.latitude}</p>
+                                  </div>
+                                  <div className="rounded px-2 py-1" style={{ background: 'rgba(255, 255, 255, 0.03)' }}>
+                                    <p className="text-xs text-gray-500">Lon</p>
+                                    <p className="text-white text-xs font-mono truncate">{aiResult.gps_coordinates.longitude}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Location - COMPACT */}
+                            {aiResult.lokasi && (
+                              <div
+                                className="flex items-center gap-2 rounded-lg p-2 transition-all hover:bg-white/5"
+                                style={{
+                                  background: 'rgba(255, 255, 255, 0.05)',
+                                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                                }}
+                              >
+                                <MapPin className="w-4 h-4 text-white flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-gray-400">Location Address</p>
+                                  <p className="text-white font-semibold text-xs truncate">{aiResult.lokasi}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-full">
+                          <Sparkles className="w-12 h-12 text-white mb-3 opacity-50" />
+                          <p className="text-white font-medium text-xs mb-1">Ready to Analyze</p>
+                          <p className="text-gray-400 text-xs text-center max-w-xs">
+                            Upload a SPAN image above
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {/* )} */}
+
+            {/* Modal Footer */}
+            <div
+              className="p-6 flex gap-3 border-t border-gray-700"
+              style={{
+                flexShrink: 0,
+                background: 'rgba(17, 24, 39, 0.5)',
+                position: 'relative',
+                zIndex: 30
+              }}
+            >
+              <button
+                onClick={handleClose}
+                className="flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all bg-white hover:bg-gray-50 border-2 border-gray-300 relative z-30"
+                style={{ color: '#374151' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="flex-1 px-4 py-3 rounded-lg text-sm font-medium transition-all bg-white hover:bg-gray-50 border-2 border-gray-300 relative z-30"
+                style={{ color: '#374151' }}
+              >
+                Add SPAN
+              </button>
+            </div>
+          </div>
+
+          {/* CSS for Space Animation */}
+          <style>{`
+                @keyframes animStar {
+                  from { transform: translateY(0px); }
+                  to { transform: translateY(-2000px); }
+                }
+        
+                .stars {
+                  width: 1px;
+                  height: 1px;
+                  background: transparent;
+                  box-shadow: ${Array.from({ length: 700 }, () =>
+            `${Math.random() * 2000}px ${Math.random() * 2000}px #FFF`
+          ).join(', ')};
+                  animation: animStar 50s linear infinite;
+                }
+        
+                .stars:after {
+                  content: " ";
+                  position: absolute;
+                  top: 2000px;
+                  width: 1px;
+                  height: 1px;
+                  background: transparent;
+                  box-shadow: ${Array.from({ length: 700 }, () =>
+            `${Math.random() * 2000}px ${Math.random() * 2000}px #FFF`
+          ).join(', ')};
+                }
+        
+                .stars2 {
+                  width: 2px;
+                  height: 2px;
+                  background: transparent;
+                  box-shadow: ${Array.from({ length: 200 }, () =>
+            `${Math.random() * 2000}px ${Math.random() * 2000}px #FFF`
+          ).join(', ')};
+                  animation: animStar 100s linear infinite;
+                }
+        
+                .stars2:after {
+                  content: " ";
+                  position: absolute;
+                  top: 2000px;
+                  width: 2px;
+                  height: 2px;
+                  background: transparent;
+                  box-shadow: ${Array.from({ length: 200 }, () =>
+            `${Math.random() * 2000}px ${Math.random() * 2000}px #FFF`
+          ).join(', ')};
+                }
+        
+                .stars3 {
+                  width: 3px;
+                  height: 3px;
+                  background: transparent;
+                  box-shadow: ${Array.from({ length: 100 }, () =>
+            `${Math.random() * 2000}px ${Math.random() * 2000}px #FFF`
+          ).join(', ')};
+                  animation: animStar 150s linear infinite;
+                }
+        
+                .stars3:after {
+                  content: " ";
+                  position: absolute;
+                  top: 2000px;
+                  width: 3px;
+                  height: 3px;
+                  background: transparent;
+                  box-shadow: ${Array.from({ length: 100 }, () =>
+            `${Math.random() * 2000}px ${Math.random() * 2000}px #FFF`
+          ).join(', ')};
+                }
+              `}</style>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && rowToDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
+          <div className="bg-white rounded-xl shadow-2xl" style={{ width: '420px' }}>
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                  <Trash2 className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Delete Survey</h3>
+                  <p className="text-sm text-gray-500">This action cannot be undone</p>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <p className="text-sm text-gray-700 mb-2">Are you sure you want to delete this survey?</p>
+                <div className="space-y-1 text-xs text-gray-600">
+                  <div><span className="font-medium">SPAN:</span> {rowToDelete.spanGroup}</div>
+                  <div><span className="font-medium">Row:</span> {rowToDelete.span}</div>
+                  <div><span className="font-medium">Designator:</span> {rowToDelete.designator}</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setRowToDelete(null);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '10px 16px',
+                    border: '1px solid #D1D5DB',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#374151',
+                    backgroundColor: 'white',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  style={{
+                    flex: 1,
+                    padding: '10px 16px',
+                    backgroundColor: '#DC2626',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: 'white',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Yes, Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

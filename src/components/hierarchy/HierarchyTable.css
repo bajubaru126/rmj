@@ -1,0 +1,199 @@
+.hierarchy-table-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.hierarchy-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+}
+
+/* Header Styling */
+.hierarchy-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+}
+
+.hierarchy-table th {
+  padding: 3px 6px;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid #d1d5db;
+  white-space: nowrap;
+  background: white;
+  line-height: 1.2;
+}
+
+/* Row 1: Main Group Headers - Light Gray */
+.header-row-1 .basic-header {
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 9px;
+  min-width: 100px;
+}
+
+.header-row-1 .group-header {
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.header-row-1 .action-header {
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 9px;
+  min-width: 120px;
+  position: sticky;
+  right: 0;
+  z-index: 11;
+  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Row 2: Phase Headers - Very Light Gray */
+.header-row-2 .phase-header {
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 9px;
+  font-weight: 600;
+  border-left: 1px solid #d1d5db;
+}
+
+/* Row 3: Field Headers - Almost White */
+.header-row-3 .field-header {
+  background: #f9fafb;
+  color: #6b7280;
+  font-size: 9px;
+  font-weight: 500;
+  min-width: 90px;
+}
+
+/* Body Styling */
+.hierarchy-table tbody td {
+  padding: 4px 6px;
+  border: 1px solid #d1d5db;
+  text-align: left;
+  white-space: nowrap;
+  font-size: 10px;
+  color: #374151;
+  line-height: 1.2;
+}
+
+.hierarchy-table tbody .even-row {
+  background: white;
+}
+
+.hierarchy-table tbody .odd-row {
+  background: #f9fafb;
+}
+
+.hierarchy-table tbody tr:hover {
+  background: #eff6ff !important;
+}
+
+/* Action Column */
+.action-cell {
+  position: sticky;
+  right: 0;
+  background: inherit;
+  z-index: 5;
+  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.05);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-buttons button {
+  padding: 6px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-buttons button:nth-child(1) {
+  color: #6b7280;
+}
+
+.action-buttons button:nth-child(1):hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.action-buttons button:nth-child(2) {
+  color: #3b82f6;
+}
+
+.action-buttons button:nth-child(2):hover {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.action-buttons button:nth-child(3) {
+  color: #ef4444;
+}
+
+.action-buttons button:nth-child(3):hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Empty State */
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* Scrollbar Styling */
+.hierarchy-table-container::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.hierarchy-table-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 5px;
+}
+
+.hierarchy-table-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 5px;
+}
+
+.hierarchy-table-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .hierarchy-table {
+    font-size: 11px;
+  }
+  
+  .hierarchy-table th,
+  .hierarchy-table td {
+    padding: 6px 10px;
+  }
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test KML Color Conversion</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .color-box { display: inline-block; width: 50px; height: 20px; margin-left: 10px; border: 1px solid #000; }
+    </style>
+</head>
+<body>
+    <h2>KML Color Conversion Test</h2>
+    <div id="results"></div>
+
+    <script>
+        function kmlColorToHex(kmlColor) {
+            if (!kmlColor || kmlColor.length < 6) {
+                return '#FF6B35'; // Default color
+            }
+            
+            kmlColor = kmlColor.trim();
+            
+            let rr, gg, bb;
+            
+            if (kmlColor.length === 8) {
+                // Format: aabbggrr
+                bb = kmlColor.substring(2, 4);
+                gg = kmlColor.substring(4, 6);
+                rr = kmlColor.substring(6, 8);
+            } else if (kmlColor.length === 6) {
+                // Format: bbggrr (no alpha)
+                bb = kmlColor.substring(0, 2);
+                gg = kmlColor.substring(2, 4);
+                rr = kmlColor.substring(4, 6);
+            } else {
+                return '#FF6B35'; // Default color
+            }
+            
+            return `#${rr}${gg}${bb}`.toUpperCase();
+        }
+
+        function kmlColorToOpacity(kmlColor) {
+            if (!kmlColor || kmlColor.length < 8) {
+                return 1.0; // Default full opacity
+            }
+            
+            const alphaHex = kmlColor.substring(0, 2);
+            const alphaDecimal = parseInt(alphaHex, 16);
+            const opacity = alphaDecimal / 255;
+            
+            return opacity;
+        }
+
+        // Test cases
+        const tests = [
+            { kml: 'ff0000ff', expected: '#FF0000', opacity: 1.0, name: 'Red (full opacity)' },
+            { kml: 'ff00ff00', expected: '#00FF00', opacity: 1.0, name: 'Green (full opacity)' },
+            { kml: 'ffff0000', expected: '#0000FF', opacity: 1.0, name: 'Blue (full opacity)' },
+            { kml: 'ffffff00', expected: '#00FFFF', opacity: 1.0, name: 'Cyan (full opacity)' },
+            { kml: 'ff00ffff', expected: '#FFFF00', opacity: 1.0, name: 'Yellow (full opacity)' },
+            { kml: 'ffff00ff', expected: '#FF00FF', opacity: 1.0, name: 'Magenta (full opacity)' },
+            { kml: '40ffffff', expected: '#FFFFFF', opacity: 0.25, name: 'White (25% opacity - YOUR KML)' },
+            { kml: '80ff0000', expected: '#0000FF', opacity: 0.5, name: 'Blue (50% opacity)' },
+            { kml: '0000ff', expected: '#FF0000', opacity: 1.0, name: 'Red (no alpha)' },
+            { kml: '00ff00', expected: '#00FF00', opacity: 1.0, name: 'Green (no alpha)' },
+            { kml: 'ff0000', expected: '#0000FF', opacity: 1.0, name: 'Blue (no alpha)' },
+        ];
+
+        const resultsDiv = document.getElementById('results');
+        
+        tests.forEach(test => {
+            const result = kmlColorToHex(test.kml);
+            const opacity = kmlColorToOpacity(test.kml);
+            const passed = result === test.expected && Math.abs(opacity - test.opacity) < 0.01;
+            
+            const div = document.createElement('div');
+            div.className = 'test';
+            div.innerHTML = `
+                <strong>${test.name}</strong><br>
+                KML: ${test.kml} → Result: ${result} 
+                <span class="color-box" style="background-color: ${result}; opacity: ${opacity}"></span><br>
+                Expected: ${test.expected} 
+                <span class="color-box" style="background-color: ${test.expected}; opacity: ${test.opacity}"></span><br>
+                Opacity: ${opacity.toFixed(2)} (expected: ${test.opacity.toFixed(2)})<br>
+                Status: ${passed ? '✅ PASS' : '❌ FAIL'}
+            `;
+            resultsDiv.appendChild(div);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+/* Custom AG Grid Theme - Quartz with Gray Headers and Rounded Corners */
+
+/* Gray header background for all AG Grid tables */
+.ag-theme-quartz .ag-header {
+  background-color: #ffffff !important; /* White */
+  border-bottom: 1px solid #E5E7EB !important;
+}
+
+.ag-theme-quartz .ag-header-cell {
+  background-color: #ffffff !important; /* White */
+  font-weight: 600;
+  color: #64748B !important; /* Slate 500 */
+  font-size: 12px;
+}
+
+.ag-theme-quartz .ag-header-cell-label {
+  color: #64748B !important; /* Slate 500 */
+}
+
+.ag-theme-quartz .ag-header-group-cell {
+  background-color: #ffffff !important; /* White */
+  color: #64748B !important; /* Slate 500 */
+  font-weight: 600;
+}
+
+.ag-theme-quartz .ag-header-group-text {
+  color: #64748B !important; /* Slate 500 */
+}
+
+/* Rounded corners for AG Grid container */
+.ag-theme-quartz {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Rounded corners for header */
+.ag-theme-quartz .ag-header {
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+}
+
+/* Rounded corners for the root wrapper */
+.ag-theme-quartz .ag-root-wrapper {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid #E5E7EB !important;
+}
+
+/* Ensure last row has rounded bottom corners */
+.ag-theme-quartz .ag-body-viewport {
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+/* Smooth borders */
+.ag-theme-quartz .ag-cell {
+  border-color: #E5E7EB !important;
+}
+
+.ag-theme-quartz .ag-row {
+  border-color: #E5E7EB !important;
+}
+
+/* Pagination rounded corners */
+.ag-theme-quartz .ag-paging-panel {
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+  border-top: 1px solid #E5E7EB !important;
+}
+
+/* Filter panel rounded corners */
+.ag-theme-quartz .ag-popup {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Context menu rounded corners */
+.ag-theme-quartz .ag-menu {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Hover effect for rows */
+.ag-theme-quartz .ag-row:hover {
+  background-color: #F3F4F6 !important;
+}
+
+/* Selected row styling */
+.ag-theme-quartz .ag-row-selected {
+  background-color: #DBEAFE !important;
+}
+
+.ag-theme-quartz .ag-row-selected:hover {
+  background-color: #BFDBFE !important;
+}
+
+/* Actions Column Styling */
+.ag-theme-quartz .ag-cell[col-id="actions"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+/* Action buttons styling */
+.ag-theme-quartz .ag-cell[col-id="actions"] button {
+  transition: all 0.2s ease;
+}
+
+.ag-theme-quartz .ag-cell[col-id="actions"] button:hover {
+  transform: scale(1.05);
+}
+
+/* Ensure actions column doesn't have horizontal scrollbar */
+.ag-theme-quartz .ag-pinned-right-cols-container {
+  overflow: hidden !important;
+}
+
+.ag-theme-quartz .ag-body-horizontal-scroll-viewport.ag-pinned-right-viewport {
+  overflow-x: hidden !important;
+}
+
+.ag-theme-quartz .ag-horizontal-right-spacer {
+  display: none !important;
+}

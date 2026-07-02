@@ -1,0 +1,236 @@
+/* BOQ Table - Ultra Clean Design */
+.boq-table-custom .ag-header {
+  background-color: #F8F9FA !important;
+  border-bottom: 1px solid #E9ECEF !important;
+}
+
+.boq-table-custom .ag-header-cell {
+  background-color: #F8F9FA !important;
+  color: #495057 !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.02em !important;
+  border-right: 1px solid #E9ECEF !important;
+  padding: 10px 12px !important;
+  line-height: 1.4 !important;
+}
+
+.boq-table-custom .ag-header-group-cell {
+  background-color: #F1F3F5 !important;
+  color: #495057 !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  border-right: 1px solid #E9ECEF !important;
+  border-bottom: 1px solid #E9ECEF !important;
+  padding: 8px 12px !important;
+}
+
+.boq-table-custom .ag-header-cell-label,
+.boq-table-custom .ag-header-group-text {
+  color: #495057 !important;
+  font-weight: 600 !important;
+}
+
+/* Pure white background for rows */
+.boq-table-custom .ag-row {
+  background-color: #FFFFFF !important;
+  border-bottom: 1px solid #F1F3F5 !important;
+}
+
+/* Hover effect only - no selection styling */
+.boq-table-custom .ag-row:hover {
+  background-color: #F8F9FA !important;
+}
+
+/* Disable row selection styling */
+.boq-table-custom .ag-row-selected {
+  background-color: #FFFFFF !important;
+}
+
+.boq-table-custom .ag-row-selected:hover {
+  background-color: #F8F9FA !important;
+}
+
+/* Remove alternating row colors for cleaner look */
+.boq-table-custom .ag-row-even {
+  background-color: #FFFFFF !important;
+}
+
+.boq-table-custom .ag-row-even:hover {
+  background-color: #F8F9FA !important;
+}
+
+/* Hide scrollbar on pinned right columns (Actions column) */
+.boq-table-custom .ag-pinned-right-cols-container {
+  overflow: hidden !important;
+}
+
+/* Hide horizontal scrollbar on pinned right viewport */
+.boq-table-custom .ag-body-horizontal-scroll-viewport.ag-pinned-right-viewport {
+  overflow-x: hidden !important;
+}
+
+/* Ensure the pinned right container doesn't show scrollbar */
+.boq-table-custom .ag-horizontal-right-spacer {
+  display: none !important;
+}
+
+/* Center align cell content vertically */
+.boq-table-custom .ag-cell {
+  display: flex !important;
+  align-items: center !important;
+  padding: 12px !important;
+  font-size: 13px !important;
+  color: #212529 !important;
+  border-right: 1px solid #F1F3F5 !important;
+  line-height: 1.5 !important;
+}
+
+/* Ensure text wrapping still works for long content */
+.boq-table-custom .ag-cell-wrapper {
+  width: 100%;
+  line-height: 1.5 !important;
+}
+
+/* Center align both horizontally and vertically for specific cells */
+.boq-table-custom .cell-center {
+  justify-content: center !important;
+}
+
+/* Uniform border styling */
+.boq-table-custom .ag-header-cell,
+.boq-table-custom .ag-cell {
+  border-color: #E9ECEF !important;
+}
+
+/* Clean borders for cells */
+.boq-table-custom .ag-cell {
+  border-bottom: 1px solid #F1F3F5 !important;
+}
+
+/* Hide filter icons for cleaner look */
+.boq-table-custom .ag-header-cell-menu-button,
+.boq-table-custom .ag-header-cell-filter-button {
+  display: none !important;
+}
+
+/* Hide sort icons by default, show on hover */
+.boq-table-custom .ag-header-cell .ag-icon {
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.boq-table-custom .ag-header-cell:hover .ag-icon {
+  opacity: 0.5 !important;
+}
+
+/* Center align header text for grouped columns (HARGA SATUAN and LOKASI) */
+.boq-table-custom .ag-header-group-cell-label {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+/* Ensure the header group cell content is centered */
+.boq-table-custom .ag-header-group-cell {
+  text-align: center !important;
+}
+
+/* Center the text inside header group cell label */
+.boq-table-custom .ag-header-group-cell-label .ag-header-group-text {
+  text-align: center !important;
+  width: 100% !important;
+  display: block !important;
+}
+
+/* Force center alignment for all header group cells */
+.boq-table-custom .ag-header-group-cell .ag-header-cell-label {
+  justify-content: center !important;
+}
+
+/* Clean borders for header group cells */
+.boq-table-custom .ag-header-group-cell {
+  border-right: 1px solid #E9ECEF !important;
+  border-left: 1px solid #E9ECEF !important;
+  border-bottom: 1px solid #E9ECEF !important;
+}
+
+/* Ensure consistent border for all header group cells */
+.boq-table-custom .ag-header-group-cell:not(:last-child) {
+  border-right: 1px solid #E9ECEF !important;
+}
+
+/* Number formatting for cleaner look */
+.boq-table-custom .ag-cell[col-id="hargaSatuanMaterial"],
+.boq-table-custom .ag-cell[col-id="hargaSatuanJasa"],
+.boq-table-custom .ag-cell[col-id="drm"],
+.boq-table-custom .ag-cell[col-id="actual"],
+.boq-table-custom .ag-cell[col-id="tambah"],
+.boq-table-custom .ag-cell[col-id="kurang"] {
+  font-variant-numeric: tabular-nums !important;
+  font-weight: 500 !important;
+  color: #212529 !important;
+}
+
+/* NO column styling */
+.boq-table-custom .ag-cell[col-id="no"] {
+  font-weight: 500 !important;
+  color: #6C757D !important;
+}
+
+/* Actions column clean styling */
+.boq-table-custom .ag-pinned-right-header,
+.boq-table-custom .ag-pinned-right-cols-container {
+  border-left: 1px solid #E9ECEF !important;
+}
+
+/* Hide AG Grid overlay when loading */
+.ag-grid-loading .ag-overlay-no-rows-wrapper {
+  display: none !important;
+}
+
+/* Hide AG Grid "No Rows To Show" message when loading */
+.ag-grid-loading .ag-overlay {
+  display: none !important;
+}
+
+/* Summary Rows Styling (regular rows at bottom, not pinned) - Same color as header */
+/* Use specific classes for summary rows */
+.boq-table-custom .ag-row.summary-row,
+.boq-table-custom .ag-row.summary-row-total {
+  background-color: #F8F9FA !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: 42px !important;
+  min-height: 42px !important;
+}
+
+.boq-table-custom .ag-row.summary-row .ag-cell,
+.boq-table-custom .ag-row.summary-row-total .ag-cell {
+  background-color: #F8F9FA !important;
+  color: #495057 !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  visibility: visible !important;
+}
+
+/* Total row (last row) - bolder */
+.boq-table-custom .ag-row.summary-row-total .ag-cell {
+  font-weight: 700 !important;
+}
+
+/* Don't apply hover effect to summary rows */
+.boq-table-custom .ag-row.summary-row:hover,
+.boq-table-custom .ag-row.summary-row-total:hover {
+  background-color: #F8F9FA !important;
+}
+
+.boq-table-custom .ag-row.summary-row:hover .ag-cell,
+.boq-table-custom .ag-row.summary-row-total:hover .ag-cell {
+  background-color: #F8F9FA !important;
+}

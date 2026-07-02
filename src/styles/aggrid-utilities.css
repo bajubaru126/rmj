@@ -1,0 +1,145 @@
+
+/* ===== Status Badge Variants ===== */
+.status-badge-ok {
+  background-color: #4caf50;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge-delay {
+  background-color: #ffc107;
+  color: #1f2937;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge-issue {
+  background-color: #ff5252;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge-implementation {
+  background-color: #3b82f6;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge-survey {
+  background-color: #8b5cf6;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+
+/* ===== Tab Navigation in Detail Panel ===== */
+.detail-tab-navigation {
+  display: flex;
+  border-bottom: 2px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 8px 8px 0 0;
+  overflow-x: auto;
+}
+
+.detail-tab-button {
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  color: #6b7280;
+}
+
+.detail-tab-button:hover {
+  color: #1f2937;
+  background-color: rgba(243, 244, 246, 0.5);
+}
+
+.detail-tab-button.active {
+  color: #005eb8;
+  border-bottom-color: #005eb8;
+  background-color: rgba(219, 234, 254, 0.3);
+}
+
+/* ===== Segmentasi Accordion Styling ===== */
+.segmentasi-accordion {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 12px;
+}
+
+.segmentasi-header {
+  padding: 16px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.segmentasi-header:hover {
+  background-color: rgba(239, 246, 255, 0.5);
+}
+
+.segmentasi-expand-button {
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.segmentasi-expand-button:hover {
+  background-color: #e5e7eb;
+}
+
+/* ===== Evidence Link Styling ===== */
+.evidence-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #2563eb;
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.evidence-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* ===== KML Status Indicators ===== */
+.kml-available {
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.kml-unavailable {
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

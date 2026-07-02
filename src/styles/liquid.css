@@ -1,0 +1,266 @@
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
+
+:root {
+  --primary-deep: #15396C;
+  --primary-medium: #1E4A8C;
+  --primary-light: #2B5BA8;
+  --accent-cyan: #00D4FF;
+  --accent-purple: #A855F7;
+  --accent-pink: #EC4899;
+  --accent-orange: #F97316;
+  --accent-green: #10B981;
+  --accent-yellow: #FBBF24;
+}
+
+body {
+  background: #FFFFFF;
+  margin: 0;
+  padding: 0;
+}
+
+/* Glassmorphism Card */
+/* Enterprise Glass Card */
+.glass-card {
+  background: #ffffff;
+  /* Solid white for enterprise readability */
+  border: 1px solid #e5e7eb;
+  /* Subtle gray border */
+  border-radius: 12px;
+  /* Slightly tighter radius */
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  /* Clean, standard shadow */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.08),
+    0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  border-color: #d1d5db;
+}
+
+/* Glass Header (legacy, kept for compat) */
+.glass-header {
+  background: linear-gradient(135deg, #15396C 0%, #1E4A8C 100%);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 24px rgba(21, 57, 108, 0.2);
+  min-height: 80px !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+  background: #0F1117;
+  border-right: none;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.sidebar-nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: none;
+  pointer-events: none;
+}
+
+/* Sidebar Menu Items */
+.sb-item-active {
+  background: #1E2433;
+  color: #FFFFFF;
+}
+
+.sb-item-inactive {
+  color: rgba(255, 255, 255, 0.50);
+}
+
+.sb-item-inactive:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.80);
+}
+
+/* Sidebar Avatar */
+.sb-avatar {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+}
+
+/* Custom scrollbar for sidebar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Liquid Button */
+.liquid-btn {
+  background: linear-gradient(135deg, #15396C 0%, #2B5BA8 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.liquid-btn:hover::before {
+  left: 100%;
+}
+
+.liquid-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(21, 57, 108, 0.4);
+}
+
+.liquid-btn-secondary {
+  background: rgba(21, 57, 108, 0.1);
+  color: #15396C;
+  border: 1px solid #15396C;
+}
+
+.liquid-btn-secondary:hover {
+  background: rgba(21, 57, 108, 0.2);
+}
+
+/* Liquid Input */
+.liquid-input {
+  background: rgba(21, 57, 108, 0.05);
+  border: 1px solid rgba(21, 57, 108, 0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #1a1a1a;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.liquid-input:focus {
+  outline: none;
+  border-color: #15396C;
+  box-shadow: 0 0 0 3px rgba(21, 57, 108, 0.1);
+  background: rgba(21, 57, 108, 0.08);
+}
+
+.liquid-input::placeholder {
+  color: rgba(26, 26, 26, 0.5);
+}
+
+/* Glass Table */
+.glass-table {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(21, 57, 108, 0.1);
+  overflow: hidden;
+}
+
+.glass-table thead {
+  background: linear-gradient(135deg, rgba(21, 57, 108, 0.08) 0%, rgba(21, 57, 108, 0.05) 100%);
+}
+
+.glass-table tbody tr {
+  border-bottom: 1px solid rgba(21, 57, 108, 0.05);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.glass-table tbody tr:hover {
+  background: rgba(0, 212, 255, 0.08);
+  transform: translateX(2px);
+}
+
+/* Status Badges */
+.badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-cyan {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 212, 255, 0.1) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  color: #0088CC;
+}
+
+.badge-purple {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(168, 85, 247, 0.1) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #8B5CF6;
+}
+
+.badge-green {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #059669;
+}
+
+.badge-orange {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.1) 100%);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  color: #EA580C;
+}
+
+.badge-pink {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(236, 72, 153, 0.1) 100%);
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  color: #DB2777;
+}
+
+.badge-yellow {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(251, 191, 36, 0.1) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: #D97706;
+}
+
+/* Progress Bar */
+.progress-liquid {
+  background: linear-gradient(90deg,
+      #00D4FF 0%,
+      #A855F7 50%,
+      #EC4899 100%);
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+  border-radius: 10px;
+}
+
+/* Tab Active */
+.tab-active {
+  background: rgba(255, 255, 255, 0.2);
+  border-bottom: 3px solid #00D4FF;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  background: rgba(21, 57, 108, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+/* Scrollbar - use browser default */

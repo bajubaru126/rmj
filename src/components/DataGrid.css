@@ -1,0 +1,53 @@
+.custom-ag-grid {
+  --ag-background-color: #ffffff;
+  --ag-header-background-color: #ffffff;
+  --ag-odd-row-background-color: #ffffff;
+  --ag-border-color: #e2e8f0;
+  --ag-row-border-color: #e2e8f0;
+  --ag-font-family: "Inter", system-ui, -apple-system, sans-serif;
+  --ag-font-size: 13px;
+  --ag-header-foreground-color: #64748b;
+  --ag-foreground-color: #0F172A;
+}
+
+.custom-ag-grid .ag-root-wrapper {
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: hidden;
+}
+
+.custom-ag-grid .ag-header {
+  border-bottom: 1px solid var(--ag-border-color) !important;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600; /* Semi-Bold (600) */
+}
+
+.custom-ag-grid .ag-row {
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.custom-ag-grid .ag-row:hover {
+  background-color: #f8fafc !important;
+}
+
+.custom-ag-grid .ag-cell {
+  display: flex;
+  align-items: center;
+  border-right: none !important;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-weight: 400; /* Regular (400) */
+}
+
+.custom-ag-grid .ag-header-cell {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.custom-ag-grid .ag-header-cell::after {
+  display: none !important;
+}

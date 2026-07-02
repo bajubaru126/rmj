@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Connection Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background: #7e22ce;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #6b21a8;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+        .info {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            color: #1e40af;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        .token-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Backend Connection Test</h1>
+    
+    <div class="test-card">
+        <h3>1. Test Health Endpoint (No Auth)</h3>
+        <button onclick="testHealth()">Test Health Check</button>
+        <div id="health-result"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>2. Test CORS Preflight</h3>
+        <button onclick="testCORS()">Test CORS</button>
+        <div id="cors-result"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>3. Test Upload Endpoint (With Auth)</h3>
+        <p style="color: #666; font-size: 14px;">Enter your JWT token (get it from browser DevTools → Application → Local Storage → token)</p>
+        <input type="text" class="token-input" id="token-input" placeholder="Paste your JWT token here...">
+        <br>
+        <input type="file" id="file-input" accept="image/*">
+        <br>
+        <button onclick="testUpload()">Test Upload</button>
+        <div id="upload-result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8080/api';
+
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = message;
+        }
+
+        async function testHealth() {
+            showResult('health-result', 'Testing...', 'info');
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                showResult('health-result', 
+                    `✅ SUCCESS!\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`, 
+                    'success'
+                );
+            } catch (error) {
+                showResult('health-result', 
+                    `❌ FAILED!\nError: ${error.message}\n\nPossible causes:\n- Backend not running\n- Wrong URL\n- Firewall blocking`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testCORS() {
+            showResult('cors-result', 'Testing CORS preflight...', 'info');
+            try {
+                // This will trigger a CORS preflight request
+                const response = await fetch(`${API_BASE}/upload?folder=evidences`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer test-token'
+                    }
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+                };
+                
+                showResult('cors-result', 
+                    `✅ CORS Preflight Response\nStatus: ${response.status}\nHeaders:\n${JSON.stringify(corsHeaders, null, 2)}`, 
+                    response.status === 200 || response.status === 204 ? 'success' : 'error'
+                );
+            } catch (error) {
+                showResult('cors-result', 
+                    `❌ CORS FAILED!\nError: ${error.message}\n\nThis means CORS is not properly configured on backend.`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testUpload() {
+            const token = document.getElementById('token-input').value.trim();
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+
+            if (!token) {
+                showResult('upload-result', '❌ Please enter a JWT token', 'error');
+                return;
+            }
+
+            if (!file) {
+                showResult('upload-result', '❌ Please select a file', 'error');
+                return;
+            }
+
+            showResult('upload-result', 'Uploading...', 'info');
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                console.log('🔍 Upload Test Details:');
+                console.log('URL:', `${API_BASE}/upload?folder=evidences`);
+                console.log('File:', file.name, file.size, 'bytes');
+                console.log('Token:', token.substring(0, 30) + '...');
+
+                const response = await fetch(`${API_BASE}/upload?folder=evidences`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('upload-result', 
+                        `✅ UPLOAD SUCCESS!\nStatus: ${response.status}\nResponse:\n${JSON.stringify(data, null, 2)}`, 
+                        'success'
+                    );
+                } else {
+                    const errorText = await response.text();
+                    showResult('upload-result', 
+                        `❌ UPLOAD FAILED!\nStatus: ${response.status}\nError: ${errorText}\n\nPossible causes:\n- Invalid token (401)\n- Token expired (401)\n- No permission (403)\n- Backend error (500)`, 
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('upload-result', 
+                    `❌ UPLOAD EXCEPTION!\nError: ${error.message}\n\nPossible causes:\n- Network error\n- CORS blocking request\n- Backend not responding`, 
+                    'error'
+                );
+            }
+        }
+    </script>
+</body>
+</html>
